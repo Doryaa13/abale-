@@ -18,14 +18,18 @@ const DadJokes = () => {
 
     // Block browser back/forward swipe gestures while on this page
     useEffect(() => {
-        const blockSwipe = (e) => {
+        const blockH = (e) => {
             if (e.cancelable) e.preventDefault();
         };
-        document.body.style.overscrollBehaviorX = 'none';
-        document.addEventListener('touchmove', blockSwipe, { passive: false });
+        document.body.style.overscrollBehavior = 'none';
+        document.body.style.touchAction = 'pan-y';
+        document.addEventListener('touchstart', blockH, { passive: false });
+        document.addEventListener('touchmove', blockH, { passive: false });
         return () => {
-            document.body.style.overscrollBehaviorX = '';
-            document.removeEventListener('touchmove', blockSwipe);
+            document.body.style.overscrollBehavior = '';
+            document.body.style.touchAction = '';
+            document.removeEventListener('touchstart', blockH);
+            document.removeEventListener('touchmove', blockH);
         };
     }, []);
 
