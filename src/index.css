@@ -1,0 +1,198 @@
+:root {
+  /* Slate Palette - Clean & Professional */
+  --bg-core: #111921;
+  /* background-dark */
+  --bg-panel: #1a2632;
+  /* surface-dark */
+  --bg-card: #151f29;
+  /* surface-darker */
+  --bg-card-hover: #1e293b;
+
+  --primary: #197fe6;
+  /* primary */
+  --primary-hover: #1666c7;
+
+  --secondary: #64748b;
+  --accent: #197fe6;
+  /* Sync with primary for neon look */
+
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+
+  --border-subtle: rgba(25, 127, 230, 0.1);
+  --shadow-neon: 0 0 10px rgba(25, 127, 230, 0.3);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+html {
+  background-color: var(--bg-core);
+  overscroll-behavior: none;
+}
+
+body {
+  margin: 0;
+  direction: rtl;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100dvh;
+  background-color: var(--bg-core);
+  color: var(--text-main);
+  font-family: 'Heebo', system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+#root {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background-color: var(--bg-core);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.font-body {
+  font-family: 'Heebo', sans-serif;
+}
+
+/* Utilities */
+.card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-panel {
+  background: rgba(26, 38, 50, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(25, 127, 230, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.carbon-card {
+  background-color: #1a2632;
+  border: 1px solid rgba(25, 127, 230, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom scrollbar for webkit */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #111921;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #197fe6;
+  border-radius: 4px;
+}
+
+/* Checkbox styling */
+.tech-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #151f29;
+  margin: 0;
+  font: inherit;
+  color: currentColor;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid #4b5563;
+  border-radius: 0.25rem;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tech-checkbox:checked {
+  background-color: #197fe6;
+  border-color: #197fe6;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.tech-checkbox:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  --tw-ring-offset-width: 2px;
+  --tw-ring-width: 2px;
+  --tw-ring-color: #197fe6;
+  --tw-ring-offset-color: #111921;
+  box-shadow: 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color), 0 0 0 var(--tw-ring-width) var(--tw-ring-color);
+}
+
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: var(--primary-hover);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Tactical Theme */
+.tactical-card {
+  background-color: #11151c;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+  border: 1px solid rgba(30, 41, 59, 0.5);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.checkbox-wrapper input:checked+div {
+  background-color: rgba(0, 243, 255, 0.2);
+  border-color: #00f3ff;
+  box-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+}
+
+.checkbox-wrapper input:checked+div svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
