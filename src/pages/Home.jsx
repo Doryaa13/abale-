@@ -61,7 +61,7 @@ const GlassExpandableCard = ({
                 overflow: 'hidden',
                 transition: 'max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             }}>
-                <p style={{ fontSize: '13px', color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
+                <p style={{ fontSize: '15px', color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>
                     {typeof text === 'string'
                         ? text.split('\n').map((line, i, arr) => (
                             <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
