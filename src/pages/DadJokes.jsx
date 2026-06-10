@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Smile, ArrowRight, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import jokesData from '../data/jokes_db.json';
@@ -15,6 +15,19 @@ const DadJokes = () => {
     const [done, setDone] = useState(false);
 
     const startXRef = useRef(null);
+
+    // Block browser back/forward swipe gestures while on this page
+    useEffect(() => {
+        const blockSwipe = (e) => {
+            if (e.cancelable) e.preventDefault();
+        };
+        document.body.style.overscrollBehaviorX = 'none';
+        document.addEventListener('touchmove', blockSwipe, { passive: false });
+        return () => {
+            document.body.style.overscrollBehaviorX = '';
+            document.removeEventListener('touchmove', blockSwipe);
+        };
+    }, []);
 
     const currentJoke = jokes[currentIndex];
     const rotation = dragX * 0.07;
