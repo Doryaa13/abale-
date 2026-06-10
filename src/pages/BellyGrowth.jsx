@@ -666,8 +666,8 @@ const CameraOverlay = ({ week, onCapture, onClose }) => {
                             src="/images/silhouette.png"
                             alt=""
                             style={{
-                                height: '70%',
-                                opacity: 0.3,
+                                height: '88%',
+                                opacity: 0.35,
                                 filter: 'brightness(2)',
                                 objectFit: 'contain'
                             }}

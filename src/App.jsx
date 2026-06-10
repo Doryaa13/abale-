@@ -262,32 +262,94 @@ const Header = () => {
 
       {/* Menu Drawer */}
       <div style={{
-        position: 'fixed', top: 0, left: 0, height: '100%', width: '280px',
-        background: 'var(--bg-panel)', zIndex: 101,
+        position: 'fixed', top: 0, left: 0, height: '100%', width: '290px',
+        background: 'rgba(10, 16, 28, 0.98)',
+        backdropFilter: 'blur(24px)',
+        borderRight: '1px solid rgba(255,255,255,0.07)',
+        boxShadow: '4px 0 40px rgba(0,0,0,0.6)',
+        zIndex: 101,
         transform: isMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
-        transition: 'transform 0.3s ease',
-        padding: '20px', display: 'flex', flexDirection: 'column', overflowY: 'auto'
+        transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+        display: 'flex', flexDirection: 'column', overflowY: 'auto'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>תפריט</h2>
-          <button onClick={() => setIsMenuOpen(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)' }}><X size={24} /></button>
+        {/* Drawer Header */}
+        <div style={{
+          padding: '20px 20px 16px',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          background: 'rgba(25, 127, 230, 0.05)',
+        }}>
+          <img src="/images/logo.png" alt="Abale" style={{ height: '28px', width: 'auto' }} />
+          <button onClick={() => setIsMenuOpen(false)} style={{
+            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
+            color: '#94a3b8', cursor: 'pointer', borderRadius: '10px',
+            width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}><X size={18} /></button>
         </div>
 
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <Link to="/timer" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: 'none', color: 'white', display: 'flex', gap: '10px', alignItems: 'center', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}><Clock size={20} /> <span>תזמון צירים</span></Link>
-          <Link to="/bag" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: 'none', color: 'white', display: 'flex', gap: '10px', alignItems: 'center', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}><ShoppingBag size={20} /> <span>תיק לחדר לידה</span></Link>
-          <Link to="/jokes" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: 'none', color: 'white', display: 'flex', gap: '10px', alignItems: 'center', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}><Smile size={20} /> <span>בדיחות אבא</span></Link>
-          <Link to="/saved" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: 'none', color: 'white', display: 'flex', gap: '10px', alignItems: 'center', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}><Bookmark size={20} /> <span>מאמרים שמורים</span></Link>
-          <Link to="/belly" onClick={() => setIsMenuOpen(false)} style={{ textDecoration: 'none', color: 'white', display: 'flex', gap: '10px', alignItems: 'center', padding: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}><Camera size={20} /> <span>מעקב בטן</span></Link>
-
-          <div className="h-px bg-gray-700 my-2"></div>
-
-
-
-          <button onClick={() => { setIsMenuOpen(false); setIsAboutOpen(true); }} style={{ background: 'none', border: 'none', color: 'white', display: 'flex', gap: '10px', alignItems: 'center', textAlign: 'right', fontSize: '1rem' }}><User size={20} /> <span>על עצמי</span></button>
-          <button onClick={() => { setIsMenuOpen(false); handleInstallClick(); }} style={{ background: 'none', border: 'none', color: '#3b82f6', display: 'flex', gap: '10px', alignItems: 'center', textAlign: 'right', fontSize: '1rem' }}><Download size={20} /> <span>התקן אפליקציה</span></button>
-          <button onClick={handlePurge} style={{ background: 'none', border: 'none', color: '#ef4444', display: 'flex', gap: '10px', alignItems: 'center', textAlign: 'right', fontSize: '1rem', marginTop: 'auto' }}><LogOut size={20} /> <span>מחק נתונים</span></button>
+        {/* Main Nav */}
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px 16px 0' }}>
+          {[
+            { to: '/timer', icon: Clock, label: 'תזמון צירים', color: '#38bdf8', bg: 'rgba(56,189,248,0.1)', border: 'rgba(56,189,248,0.2)' },
+            { to: '/bag', icon: ShoppingBag, label: 'תיק לחדר לידה', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.2)' },
+            { to: '/belly', icon: Camera, label: 'מעקב בטן', color: '#fb7185', bg: 'rgba(251,113,133,0.1)', border: 'rgba(251,113,133,0.2)' },
+            { to: '/saved', icon: Bookmark, label: 'מאמרים שמורים', color: '#fbbf24', bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.2)' },
+            { to: '/jokes', icon: Smile, label: 'בדיחות אבא', color: '#4ade80', bg: 'rgba(74,222,128,0.1)', border: 'rgba(74,222,128,0.2)' },
+          ].map(({ to, icon: Icon, label, color, bg, border }) => (
+            <Link key={to} to={to} onClick={() => setIsMenuOpen(false)} style={{
+              textDecoration: 'none', color: 'white',
+              display: 'flex', gap: '12px', alignItems: 'center',
+              padding: '13px 14px',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.07)',
+              borderRadius: '14px',
+              transition: 'all 0.2s',
+              fontWeight: 500, fontSize: '0.97rem'
+            }}>
+              <div style={{
+                width: '36px', height: '36px', borderRadius: '10px',
+                background: bg, border: `1px solid ${border}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+              }}>
+                <Icon size={18} color={color} />
+              </div>
+              {label}
+            </Link>
+          ))}
         </nav>
+
+        {/* Divider */}
+        <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '16px 16px 8px' }} />
+
+        {/* Bottom Actions */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '0 16px 16px' }}>
+          <button onClick={() => { setIsMenuOpen(false); setIsAboutOpen(true); }} style={{
+            background: 'none', border: 'none', color: '#94a3b8',
+            display: 'flex', gap: '12px', alignItems: 'center',
+            textAlign: 'right', fontSize: '0.92rem', cursor: 'pointer',
+            padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit',
+            transition: 'background 0.2s'
+          }}>
+            <User size={18} /> <span>על עצמי</span>
+          </button>
+          <button onClick={() => { setIsMenuOpen(false); handleInstallClick(); }} style={{
+            background: 'none', border: 'none', color: '#60a5fa',
+            display: 'flex', gap: '12px', alignItems: 'center',
+            textAlign: 'right', fontSize: '0.92rem', cursor: 'pointer',
+            padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit'
+          }}>
+            <Download size={18} /> <span>התקן אפליקציה</span>
+          </button>
+          <button onClick={handlePurge} style={{
+            background: 'none', border: 'none', color: '#f87171',
+            display: 'flex', gap: '12px', alignItems: 'center',
+            textAlign: 'right', fontSize: '0.92rem', cursor: 'pointer',
+            padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit',
+            marginTop: '4px'
+          }}>
+            <LogOut size={18} /> <span>מחק נתונים</span>
+          </button>
+        </div>
       </div>
 
       <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
