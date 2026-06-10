@@ -67,7 +67,7 @@ const DadJokes = () => {
     return (
         <div style={{
             padding: '20px',
-            maxWidth: '500px',
+            maxWidth: '100%',
             margin: '0 auto',
             color: '#fff',
             textAlign: 'center',
@@ -181,29 +181,6 @@ const DadJokes = () => {
                 <span style={{ color: '#4ade80' }}>אהבתי 👉</span>
             </div>
 
-            {/* Button fallback */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '20px' }}>
-                <button
-                    onClick={() => flyOut('left')}
-                    style={{
-                        width: '60px', height: '60px', borderRadius: '50%',
-                        border: '2px solid #f87171', background: 'rgba(248,113,133,0.1)',
-                        fontSize: '1.5rem', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'transform 0.15s',
-                    }}
-                >😐</button>
-                <button
-                    onClick={() => flyOut('right')}
-                    style={{
-                        width: '60px', height: '60px', borderRadius: '50%',
-                        border: '2px solid #4ade80', background: 'rgba(74,222,128,0.1)',
-                        fontSize: '1.5rem', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'transform 0.15s',
-                    }}
-                >😂</button>
-            </div>
         </div>
     );
 };
