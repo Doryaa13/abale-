@@ -66,7 +66,7 @@ const DadJokes = () => {
 
     return (
         <div style={{
-            padding: '20px',
+            padding: '20px 16px',
             maxWidth: '100%',
             margin: '0 auto',
             color: '#fff',
@@ -85,7 +85,7 @@ const DadJokes = () => {
             </div>
 
             {/* Card stack */}
-            <div style={{ position: 'relative', height: '320px' }}>
+            <div style={{ position: 'relative', height: 'calc(100vw - 32px)', maxHeight: '420px' }}>
                 {/* Background card (next joke peek) */}
                 <div style={{
                     position: 'absolute', inset: 0,
