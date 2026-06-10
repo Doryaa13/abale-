@@ -139,6 +139,8 @@ const DadJokes = () => {
             textAlign: 'center',
             minHeight: '100dvh',
             boxSizing: 'border-box',
+            overscrollBehavior: 'none',
+            touchAction: 'pan-y',
         }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
@@ -197,9 +199,9 @@ const DadJokes = () => {
                     onMouseMove={e => onDragMove(e.clientX)}
                     onMouseUp={onDragEnd}
                     onMouseLeave={onDragEnd}
-                    onTouchStart={e => onDragStart(e.touches[0].clientX)}
+                    onTouchStart={e => { e.preventDefault(); onDragStart(e.touches[0].clientX); }}
                     onTouchMove={e => { e.preventDefault(); onDragMove(e.touches[0].clientX); }}
-                    onTouchEnd={onDragEnd}
+                    onTouchEnd={e => { e.preventDefault(); onDragEnd(); }}
                 >
                     {/* LIKE badge */}
                     <div style={{
@@ -235,12 +237,12 @@ const DadJokes = () => {
                         lineHeight: 1.65,
                         fontWeight: 700,
                         color: 'white',
-                        marginBottom: '16px',
+                        textAlign: 'center',
                     }}>
                         "{currentJoke}"
                     </div>
 
-                    <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: 'auto' }}>
+                    <div style={{ color: '#64748b', fontSize: '0.85rem', position: 'absolute', bottom: '18px' }}>
                         בדיחה {currentIndex + 1} מתוך {jokes.length}
                     </div>
                 </div>
