@@ -5,20 +5,6 @@ import { getPregnancyMonth } from '../utils/pregnancyUtils';
 import { useState, useEffect } from 'react';
 import localWeeksData from '../data/weeks_db.json';
 
-// Calculate current week from stored registration data (same logic as App.jsx)
-const calcWeekFromStorage = () => {
-    const regDateStr = localStorage.getItem('abale_registration_date');
-    const initialWeek = localStorage.getItem('abale_initial_week');
-    if (!regDateStr || !initialWeek) return null;
-    const regDate = new Date(regDateStr);
-    const now = new Date();
-    const diffDays = Math.floor(Math.max(0, now - regDate) / (1000 * 60 * 60 * 24));
-    const weeksPassed = Math.floor(diffDays / 7);
-    let validWeek = parseInt(initialWeek, 10) + weeksPassed;
-    if (isNaN(validWeek)) return null;
-    return Math.min(40, Math.max(1, validWeek));
-};
-
 // ── Glass expandable card ──────────────────────────────────────────────────────
 const GlassExpandableCard = ({
     title,
@@ -148,42 +134,40 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
     useEffect(() => {
         const regDateStr = localStorage.getItem('abale_registration_date');
         if (regDateStr) {
-            const regDate = new Date(regDateStr);
-            setSwitchDay(days[regDate.getDay()]);
+            const switchDayIndex = new Date(regDateStr).getDay();
+            setSwitchDay(days[switchDayIndex]);
 
-            const now = new Date();
-            const diffMs = now - regDate;
-            const diffDays = diffMs / (1000 * 60 * 60 * 24);
-            const daysIntoCurrentWeek = diffDays % 7;
-            const daysLeft = Math.ceil(7 - daysIntoCurrentWeek);
-            setDaysUntilSwitch(daysLeft === 7 ? 0 : daysLeft);
+            // Days until the next occurrence of the switch weekday (0 = today).
+            // Computed purely from weekdays so it's always in range 0-6.
+            const todayIndex = new Date().getDay();
+            setDaysUntilSwitch((switchDayIndex - todayIndex + 7) % 7);
         }
     }, []);
 
-    // Adjusts the stored registration date to change the switch day
+    // Changes only the switch DAY — the current week number must stay the same.
+    // We shift the anchor registration date, then back-out the initial week so
+    // that (initial_week + weeksPassed) still equals the week shown right now.
     const handleSwitchDayChange = (newDayIndex) => {
         const regDateStr = localStorage.getItem('abale_registration_date');
         if (!regDateStr) return;
 
-        const currentRegDate = new Date(regDateStr);
-        const currentDayIndex = currentRegDate.getDay();
-        const diff = newDayIndex - currentDayIndex;
-        currentRegDate.setDate(currentRegDate.getDate() + diff);
+        const weekToPreserve = currentWeek;
 
-        const newDateStr = currentRegDate.toISOString();
-        localStorage.setItem('abale_registration_date', newDateStr);
+        const newRegDate = new Date(regDateStr);
+        const diff = newDayIndex - newRegDate.getDay();
+        newRegDate.setDate(newRegDate.getDate() + diff);
+        localStorage.setItem('abale_registration_date', newRegDate.toISOString());
 
-        const newWeek = calcWeekFromStorage();
-        if (newWeek) setCurrentWeek(newWeek);
+        // Recompute weeks passed against the new anchor and compensate initial_week.
+        const diffDays = Math.floor(Math.max(0, new Date() - newRegDate) / (1000 * 60 * 60 * 24));
+        const weeksPassed = Math.floor(diffDays / 7);
+        const newInitialWeek = Math.max(1, weekToPreserve - weeksPassed);
+        localStorage.setItem('abale_initial_week', newInitialWeek);
 
         setSwitchDay(days[newDayIndex]);
 
-        const now = new Date();
-        const diffMs = now - currentRegDate;
-        const diffDays = diffMs / (1000 * 60 * 60 * 24);
-        const daysIntoCurrentWeek = diffDays % 7;
-        const daysLeft = Math.ceil(7 - daysIntoCurrentWeek);
-        setDaysUntilSwitch(daysLeft === 7 ? 0 : daysLeft);
+        const todayIndex = new Date().getDay();
+        setDaysUntilSwitch((newDayIndex - todayIndex + 7) % 7);
 
         setIsEditModalOpen(false);
     };
@@ -248,8 +232,11 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
 
     // Derived calculations
     const progress = Math.min(100, Math.round((currentWeek / 40) * 100));
-    const month = getPregnancyMonth(currentWeek);
-    const trimester = Math.min(3, Math.ceil(currentWeek / 13));
+    // Month is driven by the content table (Google Sheets). Fall back to the
+    // formula only when the table has no month for this week (e.g. local JSON).
+    const month = currentWeekData?.month ?? getPregnancyMonth(currentWeek);
+    // Trimester is driven by the content table; formula is fallback only (e.g. local JSON).
+    const trimester = currentWeekData?.trimester ?? Math.min(3, Math.ceil(currentWeek / 13));
 
     // SVG ring: r=38, circumference = 2π×38 ≈ 238.76
     const CIRC = 238.76;

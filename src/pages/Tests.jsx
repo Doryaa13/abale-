@@ -16,10 +16,10 @@ const getReadingTime = (content) => {
 
 const Tests = ({ currentWeek }) => {
     const navigate = useNavigate();
-    const currentMonth = getPregnancyMonth(currentWeek);
 
     // --- State ---
     const [guidesData, setGuidesData] = useState(localGuidesData);
+    const [weeksData, setWeeksData] = useState(localWeeksData);
 
     // Exam State: { [examId]: { done: boolean, date: string | null } }
     const [examState, setExamState] = useState({});
@@ -40,8 +40,9 @@ const Tests = ({ currentWeek }) => {
     // Load Data
     useEffect(() => {
         const loadData = async () => {
-            const guides = await fetchGuidesData();
+            const [guides, weeks] = await Promise.all([fetchGuidesData(), fetchWeeksData()]);
             if (guides && guides.length > 0) setGuidesData(guides);
+            if (weeks && weeks.length > 0) setWeeksData(weeks);
         };
         loadData();
     }, []);
@@ -86,6 +87,8 @@ const Tests = ({ currentWeek }) => {
 
 
     // --- Derived Data ---
+    // Month is driven by the content table (week → month); formula is fallback only.
+    const currentMonth = weeksData.find(w => w.week === currentWeek)?.month ?? getPregnancyMonth(currentWeek);
     const currentGuide = guidesData.find(g => g.month === currentMonth) || guidesData.find(g => g.month === 1) || guidesData[0]; // Fallback to month 1
 
     // Filter Exams (ensure distinct IDs)

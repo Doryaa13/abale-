@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, User, Bookmark, BookmarkCheck } from 'lucide-react';
 import { fetchGuidesData } from '../services/sheetsService';
 import localGuidesData from '../data/guides_db.json';
+import { useAuth } from '../context/AuthContext';
+import RegistrationGate from '../components/RegistrationGate';
 
 const getReadingTime = (content) => {
     if (!content || typeof content !== 'string') return '3 דק\'';
@@ -17,6 +19,24 @@ const ArticlePage = () => {
     const [article, setArticle] = useState(null);
     const [isSaved, setIsSaved] = useState(false);
     const [notFound, setNotFound] = useState(false);
+
+    // "First article free": the first article a logged-out user opens is theirs
+    // to keep; any other article is gated until they register.
+    const { isLoggedIn } = useAuth();
+    const [articleLocked, setArticleLocked] = useState(false);
+
+    useEffect(() => {
+        if (!article) return;
+        if (isLoggedIn) { setArticleLocked(false); return; }
+        const FREE_KEY = 'abale_free_article_used';
+        const used = localStorage.getItem(FREE_KEY);
+        if (!used) {
+            localStorage.setItem(FREE_KEY, article.title);
+            setArticleLocked(false);
+        } else {
+            setArticleLocked(used !== article.title);
+        }
+    }, [article, isLoggedIn]);
 
     useEffect(() => {
         const findArticle = (data) => {
@@ -152,6 +172,11 @@ const ArticlePage = () => {
             </div>
 
             {/* Content */}
+            <RegistrationGate
+                locked={articleLocked}
+                title="המשך המאמר — בהרשמה חינמית"
+                subtitle="את המאמר הראשון קראת בחינם. הירשם (2 שניות) כדי לפתוח את כל המאמרים ולשמור אותם."
+            >
             <div className="px-6 py-6 max-w-2xl mx-auto w-full pb-20">
                 {typeof article.content === 'string' ? (
                     article.content.split('\n').map((paragraph, idx) => (
@@ -165,6 +190,7 @@ const ArticlePage = () => {
                     <p className="text-gray-300 leading-relaxed text-base">{article.content}</p>
                 )}
             </div>
+            </RegistrationGate>
         </div>
     );
 };

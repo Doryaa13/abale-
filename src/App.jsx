@@ -18,6 +18,8 @@ import SavedArticles from './pages/SavedArticles';
 import BellyGrowth from './pages/BellyGrowth';
 import { fetchGuidesData } from './services/sheetsService';
 import localGuidesData from './data/guides_db.json';
+import { useAuth } from './context/AuthContext';
+import AuthModal from './components/AuthModal';
 
 
 // --- Onboarding Tooltip Overlay ---
@@ -162,6 +164,8 @@ const Header = () => {
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const [savedArticles, setSavedArticles] = useState([]);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const { isLoggedIn, user, logout } = useAuth();
 
   // Build saved articles list from localStorage + guidesData
   const loadSavedArticles = async () => {
@@ -323,6 +327,33 @@ const Header = () => {
 
         {/* Bottom Actions */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '0 16px 16px' }}>
+          {/* Account / Sign-in */}
+          {isLoggedIn ? (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              gap: '8px', padding: '11px 14px', borderRadius: '12px',
+              background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', marginBottom: '4px',
+            }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ color: '#60a5fa', fontSize: '0.72rem' }}>מחובר</div>
+                <div style={{ color: 'white', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'ltr', textAlign: 'right' }}>{user?.email}</div>
+              </div>
+              <button onClick={() => logout()} style={{
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+                color: '#f87171', cursor: 'pointer', borderRadius: '10px', padding: '8px 12px',
+                fontSize: '0.82rem', fontFamily: 'inherit', flexShrink: 0,
+              }}>התנתק</button>
+            </div>
+          ) : (
+            <button onClick={() => { setIsMenuOpen(false); setIsAuthOpen(true); }} style={{
+              background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)', color: '#60a5fa',
+              display: 'flex', gap: '12px', alignItems: 'center',
+              textAlign: 'right', fontSize: '0.92rem', cursor: 'pointer',
+              padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit', fontWeight: 600, marginBottom: '4px',
+            }}>
+              <User size={18} /> <span>התחבר / גבה התקדמות</span>
+            </button>
+          )}
           <button onClick={() => { setIsMenuOpen(false); setIsAboutOpen(true); }} style={{
             background: 'none', border: 'none', color: '#94a3b8',
             display: 'flex', gap: '12px', alignItems: 'center',
@@ -354,6 +385,7 @@ const Header = () => {
 
       <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
       <InstallModal isOpen={isInstallModalOpen} onClose={() => setIsInstallModalOpen(false)} onInstall={handleInstallClick} isIOS={isIOS} />
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
     </>
   );
 };
@@ -535,52 +567,64 @@ const MainLayout = ({ currentWeek, setCurrentWeek }) => {
 };
 
 
+// Compute the current week from stored registration data.
+// Weeks advance every 7 days from the EXACT registration date/time — so if you
+// registered Tuesday 10am, the week changes the next Tuesday at 10am.
+// Returns a clamped week number, or null when there's no usable data.
+const computeCurrentWeek = () => {
+  const savedWeek = localStorage.getItem('abale_user_week');
+  const registrationDate = localStorage.getItem('abale_registration_date');
+  const initialWeek = localStorage.getItem('abale_initial_week');
+
+  if (registrationDate && initialWeek) {
+    const diffDays = Math.floor(Math.max(0, new Date() - new Date(registrationDate)) / (1000 * 60 * 60 * 24));
+    const weeksPassed = Math.floor(diffDays / 7);
+    let validWeek = parseInt(initialWeek, 10) + weeksPassed;
+
+    if (isNaN(validWeek)) {
+      validWeek = savedWeek ? parseInt(savedWeek, 10) : 1;
+    }
+    return Math.min(40, Math.max(1, validWeek));
+  }
+
+  if (savedWeek) {
+    const parsedSaved = parseInt(savedWeek, 10);
+    return (parsedSaved >= 1 && parsedSaved <= 40) ? parsedSaved : null;
+  }
+  return null;
+};
+
 // --- App Content ---
 const AppContent = () => {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [welcomeWeek, setWelcomeWeek] = useState(null);
 
-  // ... (Existing Week State Logic - Shortened for brevity if not changed, but must include full logic) ...
   const [currentWeek, setCurrentWeek] = useState(() => {
-    const savedWeek = localStorage.getItem('abale_user_week');
-    const registrationDate = localStorage.getItem('abale_registration_date');
-    const initialWeek = localStorage.getItem('abale_initial_week');
-    if (registrationDate && initialWeek) {
-      const regDate = new Date(registrationDate);
-      const now = new Date();
-
-      // Calculate weeks passed aligned to registration day-of-week
-      // E.g., if registered on Tuesday week 17, the next Tuesday = week 18
-      const diffTime = Math.max(0, now - regDate);
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-      // We use floor(diffDays / 7) which correctly counts full 7-day cycles
-      // This means the week advances every 7 days from the EXACT registration date/time
-      // So if you registered on Tuesday at 10am, the week changes next Tuesday at 10am
-      const weeksPassed = Math.floor(diffDays / 7);
-      let validWeek = parseInt(initialWeek, 10) + weeksPassed;
-
-      if (isNaN(validWeek)) {
-        validWeek = savedWeek ? parseInt(savedWeek, 10) : 1;
-      }
-
-      if (validWeek > 40) validWeek = 40;
-      if (validWeek < 1) validWeek = 1;
-
-      localStorage.setItem('abale_user_week', validWeek);
-      return validWeek;
-    }
-    if (savedWeek) {
-      const parsedSaved = parseInt(savedWeek, 10);
-      return (parsedSaved >= 1 && parsedSaved <= 40) ? parsedSaved : null;
-    }
-    return null;
+    const week = computeCurrentWeek();
+    if (week) localStorage.setItem('abale_user_week', week);
+    return week;
   });
+
+  // Recompute the week when the app is resumed/refocused, so a long-running
+  // session (e.g. an installed PWA returning from background) crosses the
+  // switch-day boundary without needing a full reload.
+  useEffect(() => {
+    const syncWeek = () => {
+      if (document.visibilityState !== 'visible') return;
+      const week = computeCurrentWeek();
+      if (week) setCurrentWeek(prev => (prev !== week ? week : prev));
+    };
+    document.addEventListener('visibilitychange', syncWeek);
+    window.addEventListener('focus', syncWeek);
+    return () => {
+      document.removeEventListener('visibilitychange', syncWeek);
+      window.removeEventListener('focus', syncWeek);
+    };
+  }, []);
 
   // Determine if onboarding is needed:
   // - No current week AND no onboarding_done flag = needs onboarding
-  // Note: We only set this to true initially if we absolutely know there's no week data locally.
-  // The isFetchingWeek spinner handles the waiting period for returning users.
+  // We only set this to true initially if we absolutely know there's no week data locally.
   const onboardingDone = localStorage.getItem('abale_onboarding_done');
   const [isOnboarding, setIsOnboarding] = useState(() => {
     return !currentWeek || !onboardingDone;
@@ -618,7 +662,7 @@ const AppContent = () => {
         {/* Main App Slider or Onboarding (catch-all, must be LAST) */}
         <Route path="/*" element={
           shouldRenderOnboarding
-            ? <Onboarding onComplete={(w) => { setCurrentWeek(w); setIsOnboarding(false); localStorage.setItem('abale_onboarding_done', 'true'); }} />
+            ? <Onboarding onComplete={(w) => { setCurrentWeek(w); setIsOnboarding(false); }} />
             : <MainLayout currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} />
         } />
 

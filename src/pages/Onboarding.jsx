@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, User } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import AuthModal from '../components/AuthModal';
 
 const Onboarding = ({ onComplete }) => {
     // 0 = Benefits (Welcome), 1 = Name, 2 = Week
@@ -216,6 +217,8 @@ const Onboarding = ({ onComplete }) => {
 
 const BenefitsCarousel = ({ onStart }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [isGuestConfirmOpen, setIsGuestConfirmOpen] = useState(false);
     const touchStartX = React.useRef(0);
     const touchEndX = React.useRef(0);
 
@@ -329,9 +332,9 @@ const BenefitsCarousel = ({ onStart }) => {
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
                 <button
-                    onClick={onStart}
+                    onClick={() => setIsAuthOpen(true)}
                     style={{
                         width: '100%',
                         padding: '16px',
@@ -342,12 +345,82 @@ const BenefitsCarousel = ({ onStart }) => {
                         fontSize: '1.1rem',
                         fontWeight: 'bold',
                         cursor: 'pointer',
-                        boxShadow: '0 4px 20px rgba(59,130,246,0.3)'
+                        boxShadow: '0 4px 20px rgba(59,130,246,0.3)',
+                        fontFamily: 'inherit',
                     }}
                 >
-                    בוא נתחיל
+                    צור משתמש
+                </button>
+                <button
+                    onClick={() => setIsGuestConfirmOpen(true)}
+                    style={{
+                        width: '100%',
+                        padding: '16px',
+                        borderRadius: '16px',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: '#cbd5e1',
+                        fontSize: '1.05rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        fontFamily: 'inherit',
+                    }}
+                >
+                    המשך כאורח
                 </button>
             </div>
+
+            <AuthModal
+                isOpen={isAuthOpen}
+                onClose={() => setIsAuthOpen(false)}
+                onSuccess={onStart}
+                headline="הרשמה חינמית כדי לגבות ולסנכרן את ההתקדמות שלך"
+            />
+
+            {isGuestConfirmOpen && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 10000,
+                    background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
+                }}>
+                    <div style={{
+                        width: '100%', maxWidth: '340px',
+                        background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+                        border: '1px solid rgba(59,130,246,0.3)', borderRadius: '24px',
+                        padding: '28px 22px', boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
+                        textAlign: 'center',
+                    }}>
+                        <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'white', margin: '0 0 12px' }}>
+                            המשך כאורח
+                        </h2>
+                        <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 22px' }}>
+                            בלי הרשמה, ההתקדמות שלך נשמרת רק על המכשיר הזה - היא לא תסונכרן ולא תהיה גיבוי אם תעבור מכשיר או תמחק את האפליקציה. אפשר להירשם בכל שלב מאוחר יותר.
+                        </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <button
+                                onClick={onStart}
+                                style={{
+                                    width: '100%', padding: '14px', borderRadius: '14px',
+                                    background: 'var(--primary)', border: 'none', color: 'white',
+                                    fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'inherit',
+                                }}
+                            >
+                                אני מבין, רוצה להמשיך כאורח
+                            </button>
+                            <button
+                                onClick={() => setIsGuestConfirmOpen(false)}
+                                style={{
+                                    width: '100%', padding: '14px', borderRadius: '14px',
+                                    background: 'transparent', border: 'none', color: '#64748b',
+                                    fontSize: '0.95rem', cursor: 'pointer', fontFamily: 'inherit',
+                                }}
+                            >
+                                ביטול
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

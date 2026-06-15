@@ -3,8 +3,15 @@ import React, { useState, useEffect } from 'react';
 import localWeeksData from '../data/weeks_db.json';
 import { fetchWeeksData } from '../services/sheetsService';
 import AdSense from '../components/AdSense';
+import { useAuth } from '../context/AuthContext';
+import RegistrationGate from '../components/RegistrationGate';
 
 const OpsLog = ({ currentWeek }) => {
+    // Gate: the user's first week is free; from the next week on, require sign-in.
+    const { isLoggedIn } = useAuth();
+    const initialWeek = parseInt(localStorage.getItem('abale_initial_week'), 10);
+    const firstWeekFree = !initialWeek || currentWeek <= initialWeek;
+    const tasksLocked = !firstWeekFree && !isLoggedIn;
     // --- Logic Section (Unchanged) ---
     const compliments = [
         "אתה אגדה. האשה שלך זכתה בפיס.",
@@ -127,6 +134,11 @@ const OpsLog = ({ currentWeek }) => {
                 )}
             </header>
 
+            <RegistrationGate
+                locked={tasksLocked}
+                title={`משימות שבוע ${currentWeek} — בהרשמה חינמית`}
+                subtitle="את משימות השבוע הראשון פתחת בחינם. הירשם (2 שניות) כדי להמשיך לקבל את כל המשימות השבועיות ולשמור את ההתקדמות."
+            >
             <main className="flex-1 px-4 space-y-6">
                 {currentWeekData.tasks ? currentWeekData.tasks.map((category, catIdx) => {
                     // Define Themes Array (Cyclic)
@@ -299,6 +311,7 @@ const OpsLog = ({ currentWeek }) => {
                     </div>
                 )}
             </main>
+            </RegistrationGate>
 
             {/* Sticky Ad Placeholder */}
             <div className="fixed bottom-[70px] left-0 right-0 z-[45] flex justify-center pointer-events-none h-[60px] overflow-hidden">
