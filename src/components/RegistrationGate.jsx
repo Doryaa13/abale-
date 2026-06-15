@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import AuthModal from './AuthModal';
+import { GATE_REGISTRATION } from '../config/features';
 
 /**
  * Wraps gated content. When `locked` is true AND no user is signed in, the
@@ -15,7 +16,9 @@ const RegistrationGate = ({ locked, title, subtitle, children }) => {
   const { isLoggedIn } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
 
-  if (isLoggedIn || !locked) return children;
+  // Gate disabled (e.g. during AdSense review), already signed in, or this
+  // instance isn't locked → show the content as-is.
+  if (!GATE_REGISTRATION || isLoggedIn || !locked) return children;
 
   return (
     <div style={{ position: 'relative' }}>

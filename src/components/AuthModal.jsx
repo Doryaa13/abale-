@@ -22,6 +22,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
   const [mode, setMode] = useState('register'); // 'register' | 'login'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -41,6 +42,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
       case 'auth/cancelled-popup-request': return 'ההתחברות בוטלה.';
       case 'auth/network-request-failed': return 'אין חיבור לאינטרנט. נסה שוב.';
       case 'auth/too-many-requests': return 'יותר מדי ניסיונות. נסה שוב בעוד כמה דקות.';
+      case 'auth/operation-not-allowed': return 'הרשמה במייל אינה מופעלת כרגע. נסה דרך Google.';
       default: return 'משהו השתבש, נסה שוב.';
     }
   };
@@ -65,8 +67,19 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
       setError('נא למלא אימייל וסיסמה');
       return;
     }
-    if (mode === 'register') run(() => register(email.trim(), password, consent));
-    else run(() => login(email.trim(), password));
+    if (mode === 'register') {
+      if (password.length < 6) {
+        setError('הסיסמה צריכה להכיל לפחות 6 תווים');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError('הסיסמאות אינן תואמות');
+        return;
+      }
+      run(() => register(email.trim(), password, consent));
+    } else {
+      run(() => login(email.trim(), password));
+    }
   };
 
   const inputStyle = {
@@ -123,10 +136,17 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
             <Mail size={18} color="#64748b" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '14px' }} />
             <input type="email" placeholder="אימייל" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} dir="ltr" />
           </div>
-          <div style={{ position: 'relative', marginBottom: '14px' }}>
+          <div style={{ position: 'relative', marginBottom: mode === 'register' ? '12px' : '14px' }}>
             <Lock size={18} color="#64748b" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '14px' }} />
             <input type="password" placeholder="סיסמה" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} dir="ltr" />
           </div>
+
+          {mode === 'register' && (
+            <div style={{ position: 'relative', marginBottom: '14px' }}>
+              <Lock size={18} color="#64748b" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '14px' }} />
+              <input type="password" placeholder="אימות סיסמה" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={inputStyle} dir="ltr" />
+            </div>
+          )}
 
           {/* Marketing consent — opt-in, only on register (Israeli anti-spam law) */}
           {mode === 'register' && (
@@ -157,7 +177,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
         {/* Toggle mode */}
         <p style={{ color: '#94a3b8', fontSize: '0.9rem', textAlign: 'center', margin: '18px 0 0' }}>
           {mode === 'register' ? 'כבר יש לך חשבון?' : 'עדיין אין לך חשבון?'}{' '}
-          <button onClick={() => { setMode(mode === 'register' ? 'login' : 'register'); setError(''); }} style={{
+          <button onClick={() => { setMode(mode === 'register' ? 'login' : 'register'); setError(''); setConfirmPassword(''); }} style={{
             background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer',
             fontWeight: 700, fontFamily: 'inherit', fontSize: '0.9rem',
           }}>

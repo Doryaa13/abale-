@@ -16,6 +16,7 @@ import Tests from './pages/Tests';
 import ArticlePage from './pages/ArticlePage';
 import SavedArticles from './pages/SavedArticles';
 import BellyGrowth from './pages/BellyGrowth';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import { fetchGuidesData } from './services/sheetsService';
 import localGuidesData from './data/guides_db.json';
 import { useAuth } from './context/AuthContext';
@@ -380,6 +381,14 @@ const Header = () => {
           }}>
             <LogOut size={18} /> <span>מחק נתונים</span>
           </button>
+          <Link to="/privacy" onClick={() => setIsMenuOpen(false)} style={{
+            textDecoration: 'none', color: '#64748b',
+            display: 'flex', gap: '12px', alignItems: 'center',
+            textAlign: 'right', fontSize: '0.85rem',
+            padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit',
+          }}>
+            <ShieldIcon size={16} /> <span>מדיניות פרטיות</span>
+          </Link>
         </div>
       </div>
 
@@ -658,6 +667,7 @@ const AppContent = () => {
         <Route path="/belly" element={<BellyGrowth currentWeek={currentWeek} />} />
         <Route path="/article/:id" element={<ArticlePage />} />
         <Route path="/jokes" element={<DadJokes />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
 
         {/* Main App Slider or Onboarding (catch-all, must be LAST) */}
         <Route path="/*" element={
