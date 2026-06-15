@@ -349,7 +349,7 @@ const BenefitsCarousel = ({ onStart }) => {
                         fontFamily: 'inherit',
                     }}
                 >
-                    צור משתמש
+                    צור משתמש / התחברות
                 </button>
                 <button
                     onClick={() => setIsGuestConfirmOpen(true)}
