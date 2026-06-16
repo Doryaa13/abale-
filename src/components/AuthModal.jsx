@@ -121,7 +121,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
               <MailCheck size={30} color="#60a5fa" />
             </div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', margin: '0 0 10px' }}>
-              כמעט סיימנו!
+              נרשמת בהצלחה! 🎉
             </h2>
             <p style={{ color: '#cbd5e1', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 6px' }}>
               שלחנו קישור אימות לכתובת:
@@ -130,7 +130,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
               {email.trim()}
             </p>
             <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 22px' }}>
-              היכנס למייל ולחץ על הקישור כדי לסיים את ההרשמה. לא רואה אותו? בדוק בתיקיית הספאם.
+              מומלץ לאמת את הכתובת (לא חובה כדי להמשיך). לא רואה את המייל? בדוק בתיקיית הספאם.
             </p>
             <button onClick={finishAfterRegister} style={{
               width: '100%', padding: '15px', borderRadius: '14px',
@@ -138,7 +138,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
               fontSize: '1.05rem', fontWeight: 'bold', cursor: 'pointer',
               boxShadow: '0 4px 20px rgba(59,130,246,0.4)', fontFamily: 'inherit',
             }}>
-              המשך
+              המשך לאפליקציה
             </button>
           </div>
         ) : (
