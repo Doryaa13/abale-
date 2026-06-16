@@ -143,7 +143,19 @@ import imgLifestyle from '../assets/images/articles/lifestyle.png';
 import month2Img from '../assets/images/articles/month2.png';
 import sheMonth1Img from '../assets/images/articles/she_month1.png';
 
-// Helper to assign images based on content
+// Image library — the keys are exactly what content writers type in the sheet's
+// Photo_Name column (case/spacing-insensitive).
+const IMAGE_BY_NAME = {
+    trimesters: imgTrimesters,
+    nutrition: imgNutrition,
+    medical: imgMedical,
+    lifestyle: imgLifestyle,
+    month2: month2Img,
+    she_month1: sheMonth1Img,
+};
+
+// Helper to assign an image based on the title's keywords (the fallback used
+// whenever Photo_Name is empty or unrecognized).
 const getArticleImage = (title) => {
     if (!title) return imgLifestyle;
     const t = title.toLowerCase();
@@ -156,6 +168,17 @@ const getArticleImage = (title) => {
     if (t.includes('אוכל') || t.includes('תזונה') || t.includes('דיאטה') || t.includes('food')) return imgNutrition;
     if (t.includes('בדיקה') || t.includes('אולטרסאונד') || t.includes('רופא') || t.includes('סקירה')) return imgMedical;
     return imgLifestyle; // Default
+};
+
+// Resolve the article image: an explicit Photo_Name from the sheet wins;
+// otherwise fall back to keyword detection on the title.
+const resolveArticleImage = (photoName, title) => {
+    if (photoName && typeof photoName === 'string') {
+        // Normalize "Month2", " she month1 ", etc. to a library key.
+        const key = photoName.trim().toLowerCase().replace(/[\s-]+/g, '_');
+        if (IMAGE_BY_NAME[key]) return IMAGE_BY_NAME[key];
+    }
+    return getArticleImage(title);
 };
 
 
@@ -215,6 +238,9 @@ const mergeGuidesData = (examsRows, articlesRows) => {
             const title = row[`article_title${i}`];
             const author = row[`Name_title_article${i}`];
             const content = row[`text_article${i}`];
+            // Photo_Name${i} lets each article in the row pick its own image;
+            // a single row-level Photo_Name applies to all articles in the row.
+            const photoName = row[`Photo_Name${i}`] || row['Photo_Name'];
 
             if (title && title.trim()) {
                 const exists = monthObj.articles.some(a => a.title === title);
@@ -224,7 +250,7 @@ const mergeGuidesData = (examsRows, articlesRows) => {
                         title: title,
                         author: author || 'מומחה אבאלה',
                         content: content || 'טוען תוכן...',
-                        image: getArticleImage(title),
+                        image: resolveArticleImage(photoName, title),
                         gradient: 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%)' // Dark overlay for image
                     });
                 }

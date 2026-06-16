@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendEmailVerification,
   signOut,
 } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -75,6 +76,13 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, marketingConsent) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
+    // Fire off a verification link so we can confirm the email is real/active.
+    // Non-blocking: a failure here must not break a successful registration.
+    try {
+      await sendEmailVerification(cred.user);
+    } catch (e) {
+      console.warn('Failed to send verification email', e);
+    }
     return handleSignIn(cred.user, { marketingConsent });
   };
 

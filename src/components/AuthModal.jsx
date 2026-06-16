@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, Loader2 } from 'lucide-react';
+import { X, Mail, Lock, Loader2, MailCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 // Inline Google "G" mark (lucide has no brand logo).
@@ -26,6 +26,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [verificationSent, setVerificationSent] = useState(false);
 
   if (!isOpen) return null;
 
@@ -47,19 +48,24 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
     }
   };
 
-  const run = async (fn) => {
+  // afterSuccess overrides the default "fire onSuccess + close" behavior — used
+  // by email registration to show the "check your inbox" screen instead.
+  const run = async (fn, afterSuccess) => {
     setError('');
     setBusy(true);
     try {
       await fn();
-      onSuccess?.();
-      onClose?.();
+      if (afterSuccess) afterSuccess();
+      else { onSuccess?.(); onClose?.(); }
     } catch (e) {
       setError(messageFor(e));
     } finally {
       setBusy(false);
     }
   };
+
+  // Proceed into the app after the verification screen.
+  const finishAfterRegister = () => { onSuccess?.(); onClose?.(); };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -76,7 +82,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
         setError('הסיסמאות אינן תואמות');
         return;
       }
-      run(() => register(email.trim(), password, consent));
+      run(() => register(email.trim(), password, consent), () => setVerificationSent(true));
     } else {
       run(() => login(email.trim(), password));
     }
@@ -100,11 +106,43 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
         border: '1px solid rgba(59,130,246,0.3)', borderRadius: '24px',
         padding: '28px 22px', boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
       }}>
-        <button onClick={onClose} style={{
+        <button onClick={verificationSent ? finishAfterRegister : onClose} style={{
           position: 'absolute', top: '14px', left: '14px', background: 'transparent',
           border: 'none', color: '#64748b', cursor: 'pointer',
         }}><X size={22} /></button>
 
+        {verificationSent ? (
+          <div style={{ textAlign: 'center', padding: '8px 0' }}>
+            <div style={{
+              width: '64px', height: '64px', borderRadius: '50%', margin: '6px auto 18px',
+              background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <MailCheck size={30} color="#60a5fa" />
+            </div>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', margin: '0 0 10px' }}>
+              כמעט סיימנו!
+            </h2>
+            <p style={{ color: '#cbd5e1', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 6px' }}>
+              שלחנו קישור אימות לכתובת:
+            </p>
+            <p style={{ color: '#60a5fa', fontSize: '0.95rem', fontWeight: 600, margin: '0 0 16px', direction: 'ltr' }}>
+              {email.trim()}
+            </p>
+            <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 22px' }}>
+              היכנס למייל ולחץ על הקישור כדי לסיים את ההרשמה. לא רואה אותו? בדוק בתיקיית הספאם.
+            </p>
+            <button onClick={finishAfterRegister} style={{
+              width: '100%', padding: '15px', borderRadius: '14px',
+              background: 'var(--primary)', border: 'none', color: 'white',
+              fontSize: '1.05rem', fontWeight: 'bold', cursor: 'pointer',
+              boxShadow: '0 4px 20px rgba(59,130,246,0.4)', fontFamily: 'inherit',
+            }}>
+              המשך
+            </button>
+          </div>
+        ) : (
+        <>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', margin: '4px 0 6px', textAlign: 'center' }}>
           {mode === 'register' ? 'הרשמה חינמית' : 'התחברות'}
         </h2>
@@ -186,6 +224,8 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
         </p>
 
         <style>{`.spin { animation: authspin 0.8s linear infinite; } @keyframes authspin { to { transform: rotate(360deg); } }`}</style>
+        </>
+        )}
       </div>
     </div>
   );
