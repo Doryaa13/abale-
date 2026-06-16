@@ -393,7 +393,7 @@ const Header = () => {
       </div>
 
       <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
-      <InstallModal isOpen={isInstallModalOpen} onClose={() => setIsInstallModalOpen(false)} onInstall={handleInstallClick} isIOS={isIOS} />
+      <InstallModal isOpen={isInstallModalOpen} onClose={() => setIsInstallModalOpen(false)} onInstall={handleInstallClick} isIOS={isIOS} canPrompt={!!deferredPrompt} />
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
     </>
   );

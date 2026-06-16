@@ -1,8 +1,12 @@
 import React from 'react';
-import { X, Share, PlusSquare, ArrowDownCircle } from 'lucide-react';
+import { X, Share, PlusSquare, ArrowDownCircle, MoreVertical } from 'lucide-react';
 
-const InstallModal = ({ isOpen, onClose, onInstall, isIOS }) => {
+const InstallModal = ({ isOpen, onClose, onInstall, isIOS, canPrompt }) => {
     if (!isOpen) return null;
+
+    const stepNum = (n) => (
+        <span style={{ background: 'var(--bg-core)', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold', flexShrink: 0 }}>{n}</span>
+    );
 
     return (
         <div style={{
@@ -74,7 +78,7 @@ const InstallModal = ({ isOpen, onClose, onInstall, isIOS }) => {
                             <PlusSquare size={20} />
                         </div>
                     </div>
-                ) : (
+                ) : canPrompt ? (
                     <button
                         onClick={onInstall}
                         style={{
@@ -95,6 +99,20 @@ const InstallModal = ({ isOpen, onClose, onInstall, isIOS }) => {
                         <ArrowDownCircle size={20} />
                         התקן כעת
                     </button>
+                ) : (
+                    <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '16px', padding: '15px', textAlign: 'right' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px', color: '#e2e8f0' }}>
+                            {stepNum(1)}
+                            <span>פתח את תפריט הדפדפן</span>
+                            <MoreVertical size={20} style={{ color: '#3b82f6' }} />
+                        </div>
+                        <div style={{ width: '1px', height: '15px', background: 'var(--border-subtle)', marginRight: '11px', marginBottom: '5px' }}></div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e2e8f0' }}>
+                            {stepNum(2)}
+                            <span>בחר <strong>"התקן אפליקציה"</strong> או <strong>"הוסף למסך הבית"</strong></span>
+                            <PlusSquare size={20} />
+                        </div>
+                    </div>
                 )}
 
             </div>
