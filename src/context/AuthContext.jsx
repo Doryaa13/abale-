@@ -92,7 +92,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    // Back up the latest local state to the cloud BEFORE clearing it, so nothing
+    // is lost — it's restored on the next sign-in.
+    try {
+      if (user) await pushToCloud(user.uid);
+    } catch (e) {
+      console.warn('Backup before logout failed', e);
+    }
     await signOut(auth);
+    // Clear local data (safe — it's in the cloud) and return to the welcome screen.
+    localStorage.clear();
+    window.location.href = '/';
   };
 
   const value = { user, isLoggedIn: !!user, loading, login, register, loginWithGoogle, logout };
