@@ -120,12 +120,6 @@ const SavedArticles = () => {
                                     </h3>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
                                         <span style={{ fontSize: '0.72rem', color: '#8b5cf6', fontFamily: 'monospace' }}>חודש {article.month}</span>
-                                        {article.author && (
-                                            <>
-                                                <span style={{ color: '#334155', fontSize: '0.7rem' }}>·</span>
-                                                <span style={{ fontSize: '0.72rem', color: '#64748b' }}>{article.author}</span>
-                                            </>
-                                        )}
                                     </div>
                                 </div>
 

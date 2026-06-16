@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowRight, User, Bookmark, BookmarkCheck } from 'lucide-react';
+import { ArrowRight, Bookmark, BookmarkCheck } from 'lucide-react';
 import { fetchGuidesData } from '../services/sheetsService';
 import localGuidesData from '../data/guides_db.json';
 import { useAuth } from '../context/AuthContext';
@@ -160,13 +160,7 @@ const ArticlePage = () => {
                     </h1>
 
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-surface-dark border border-gray-700 flex items-center justify-center overflow-hidden">
-                            <User size={20} className="text-gray-400" />
-                        </div>
-                        <div>
-                            <p className="text-sm font-bold text-white">{article.author || 'צוות אבאלה'}</p>
-                            <p className="text-xs text-gray-400">{getReadingTime(article.content)}</p>
-                        </div>
+                        <p className="text-xs text-gray-400">{getReadingTime(article.content)}</p>
                     </div>
                 </div>
             </div>

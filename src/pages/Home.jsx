@@ -5,6 +5,24 @@ import { getPregnancyMonth } from '../utils/pregnancyUtils';
 import { useState, useEffect } from 'react';
 import localWeeksData from '../data/weeks_db.json';
 
+// ── Baby-size icon ─────────────────────────────────────────────────────────────
+// Tries to show a real photo at /images/week{N}.png (drop files into public/images
+// and commit them). If no image exists for that week, falls back to the emoji.
+const BabySizeIcon = ({ week, emoji }) => {
+    const [imgFailed, setImgFailed] = useState(false);
+    useEffect(() => { setImgFailed(false); }, [week]);
+
+    if (imgFailed) return <span>{emoji}</span>;
+    return (
+        <img
+            src={`/images/week${week}.png`}
+            alt=""
+            onError={() => setImgFailed(true)}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px' }}
+        />
+    );
+};
+
 // ── Glass expandable card ──────────────────────────────────────────────────────
 const GlassExpandableCard = ({
     title,
@@ -371,7 +389,7 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
                     fontSize: '26px',
                     flexShrink: 0,
                 }}>
-                    {getBabySizeEmoji(currentWeek)}
+                    <BabySizeIcon week={currentWeek} emoji={getBabySizeEmoji(currentWeek)} />
                 </div>
                 <div>
                     <div style={{ fontSize: '10px', color: '#8896aa', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '3px' }}>גודל משוער</div>

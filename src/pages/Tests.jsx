@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, ArrowLeft, Bookmark, BookmarkCheck, User, X, Info } from 'lucide-react';
+import { Calendar, ArrowLeft, Bookmark, BookmarkCheck, X, Info } from 'lucide-react';
 import { fetchGuidesData, fetchWeeksData } from '../services/sheetsService';
 import localGuidesData from '../data/guides_db.json';
 import localWeeksData from '../data/weeks_db.json';
@@ -259,13 +259,6 @@ const Tests = ({ currentWeek }) => {
                                                 <p className="text-xs text-gray-400 line-clamp-2">
                                                     {typeof article.content === 'string' ? article.content.substring(0, 60) + '...' : 'לחץ לקריאה מלאה'}
                                                 </p>
-                                            </div>
-
-                                            <div className="flex items-center gap-2 mt-2">
-                                                <div className="w-6 h-6 rounded-full bg-gray-700 overflow-hidden border border-gray-600 flex items-center justify-center">
-                                                    <User size={14} className="text-gray-400" />
-                                                </div>
-                                                <span className="text-[10px] text-gray-500">{article.author || 'צוות אבאלה'}</span>
                                             </div>
                                         </div>
                                     </div>
