@@ -10,3 +10,7 @@
 // "first one free" logic stays intact in Log.jsx / ArticlePage.jsx — this flag
 // just makes RegistrationGate a pass-through while it's false.
 export const GATE_REGISTRATION = false;
+
+// Show a labeled "ad slot" placeholder where AdSense ads will render, so the ad
+// locations are visible before approval. Set to false once real ads are serving.
+export const SHOW_AD_PLACEHOLDERS = true;
