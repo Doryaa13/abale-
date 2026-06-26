@@ -170,6 +170,34 @@ button:active {
   transform: scale(0.98);
 }
 
+/* Kill the "stuck blue" look when tapping buttons/icons:
+   - no mobile tap-highlight flash
+   - icons/labels can't be accidentally text-selected (the lingering blue "selected" state)
+   - focus ring only shows for keyboard users (:focus-visible), not after a click/tap */
+button,
+a,
+[role="button"],
+.material-symbols-outlined,
+.material-icons {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+[role="button"],
+.material-symbols-outlined,
+.material-icons,
+svg {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+[role="button"]:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Tactical Theme */
 .tactical-card {
   background-color: #11151c;

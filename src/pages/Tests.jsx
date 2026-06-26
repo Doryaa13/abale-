@@ -6,6 +6,7 @@ import localGuidesData from '../data/guides_db.json';
 import localWeeksData from '../data/weeks_db.json';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';
 import DateModal from '../components/DateModal';
+import AdSense from '../components/AdSense';
 
 const getReadingTime = (content) => {
     if (!content || typeof content !== 'string') return '3 דק\'';
@@ -132,8 +133,13 @@ const Tests = ({ currentWeek }) => {
                             const borderColor = isBlue ? 'border-r-neon-blue' : 'border-r-neon-orange';
                             const hoverDecoration = isBlue ? 'decoration-neon-blue/50' : 'decoration-neon-orange/50';
 
+                            // Show an ad slot between exams (after the 2nd), only when
+                            // there are enough exams for it to actually fall in the middle.
+                            const showAdAfter = idx === 1 && exams.length > 2;
+
                             return (
-                                <div key={exam.id || idx} className={`tactical-card rounded-2xl overflow-hidden relative group border-r-2 ${borderColor} hover:border-r-4 transition-all duration-300`}>
+                              <React.Fragment key={exam.id || idx}>
+                                <div className={`tactical-card rounded-2xl overflow-hidden relative group border-r-2 ${borderColor} hover:border-r-4 transition-all duration-300`}>
                                     <div className="p-5">
                                         <div className="flex justify-between items-start mb-2">
                                             <h3 className="text-base font-bold text-white">{exam.name}</h3>
@@ -185,6 +191,11 @@ const Tests = ({ currentWeek }) => {
                                         </div>
                                     </div>
                                 </div>
+
+                                {showAdAfter && (
+                                    <AdSense style={{ margin: '4px 0' }} />
+                                )}
+                              </React.Fragment>
                             );
                         })}
                     </div>

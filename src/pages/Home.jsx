@@ -1,4 +1,4 @@
-import { Calendar, Hash, ChevronDown } from 'lucide-react';
+import { Calendar, Hash, ChevronDown, CalendarDays, X } from 'lucide-react';
 import AdSense from '../components/AdSense';
 import { fetchWeeksData } from '../services/sheetsService';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';
@@ -22,6 +22,139 @@ const BabySizeIcon = ({ week, emoji }) => {
         />
     );
 };
+
+// ── Pregnancy calendar (weeks → months → trimesters) ───────────────────────────
+// Mirrors getPregnancyMonth() in pregnancyUtils.js. If that mapping ever changes,
+// update it here too so the table stays in sync with the rest of the app.
+const PREGNANCY_CALENDAR = [
+    {
+        trimester: 1,
+        accent: '#14b8a6',
+        months: [
+            { month: 1, from: 1, to: 6, label: '1–6' },
+            { month: 2, from: 7, to: 10, label: '7–10' },
+            { month: 3, from: 11, to: 15, label: '11–15' },
+        ],
+    },
+    {
+        trimester: 2,
+        accent: '#f97316',
+        months: [
+            { month: 4, from: 16, to: 19, label: '16–19' },
+            { month: 5, from: 20, to: 23, label: '20–23' },
+            { month: 6, from: 24, to: 27, label: '24–27' },
+        ],
+    },
+    {
+        trimester: 3,
+        accent: '#f43f5e',
+        months: [
+            { month: 7, from: 28, to: 32, label: '28–32' },
+            { month: 8, from: 33, to: 36, label: '33–36' },
+            { month: 9, from: 37, to: 99, label: '37–40+' },
+        ],
+    },
+];
+
+// Clean popup: a colored trimester badge beside a simple חודש | שבוע table.
+// The month containing the current week is highlighted.
+const WeekCalendarModal = ({ currentWeek, onClose }) => (
+    <div style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '20px', boxSizing: 'border-box',
+    }}>
+        {/* Backdrop */}
+        <div onClick={onClose} style={{
+            position: 'absolute', inset: 0,
+            background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(6px)',
+        }} />
+
+        {/* Modal box */}
+        <div style={{
+            position: 'relative', zIndex: 1,
+            background: '#1a2738',
+            border: '1px solid rgba(255,255,255,0.12)',
+            borderRadius: '22px',
+            padding: '20px',
+            width: '100%', maxWidth: '360px',
+            maxHeight: '85vh', overflowY: 'auto',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
+        }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+                <p style={{ color: 'white', fontSize: '16px', fontWeight: 800, margin: 0 }}>
+                    לוח ההיריון
+                </p>
+                <button onClick={onClose} style={{
+                    background: 'rgba(255,255,255,0.06)', border: 'none',
+                    borderRadius: '10px', width: '32px', height: '32px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', flexShrink: 0,
+                }}>
+                    <X size={16} color="#cbd5e1" />
+                </button>
+            </div>
+
+            {/* Trimesters */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {PREGNANCY_CALENDAR.map((tri) => (
+                    <div key={tri.trimester} style={{
+                        display: 'flex', alignItems: 'center', gap: '16px',
+                        padding: '4px 2px',
+                    }}>
+                        {/* Trimester badge */}
+                        <div style={{
+                            flexShrink: 0,
+                            width: '66px', height: '66px', borderRadius: '50%',
+                            background: tri.accent,
+                            display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', justifyContent: 'center',
+                            boxShadow: `0 6px 18px ${tri.accent}55`,
+                        }}>
+                            <span style={{ fontSize: '8px', fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: '0.5px' }}>טרימסטר</span>
+                            <span style={{ fontSize: '30px', fontWeight: 900, color: 'white', lineHeight: 1 }}>{tri.trimester}</span>
+                        </div>
+
+                        {/* חודש | שבוע table */}
+                        <div style={{ flex: 1 }}>
+                            <div style={{
+                                display: 'flex', justifyContent: 'space-between',
+                                fontSize: '10px', fontWeight: 700, letterSpacing: '1px',
+                                color: tri.accent, padding: '0 4px 6px',
+                            }}>
+                                <span>חודש</span>
+                                <span>שבוע</span>
+                            </div>
+                            {tri.months.map((m, idx) => {
+                                const isCurrent = currentWeek >= m.from && currentWeek <= m.to;
+                                return (
+                                    <div key={m.month} style={{
+                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                        padding: '6px 8px', borderRadius: '8px',
+                                        borderTop: idx === 0 ? 'none' : '1px dotted rgba(255,255,255,0.1)',
+                                        background: isCurrent ? `${tri.accent}22` : 'transparent',
+                                    }}>
+                                        <span style={{
+                                            fontSize: '14px', fontFamily: 'monospace',
+                                            fontWeight: isCurrent ? 800 : 600,
+                                            color: isCurrent ? 'white' : '#cbd5e1',
+                                        }}>{m.month}</span>
+                                        <span style={{
+                                            fontSize: '13px', fontFamily: 'monospace',
+                                            fontWeight: isCurrent ? 800 : 500,
+                                            color: isCurrent ? 'white' : '#8896aa',
+                                        }}>{m.label}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+);
 
 // ── Glass expandable card ──────────────────────────────────────────────────────
 const GlassExpandableCard = ({
@@ -146,6 +279,7 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
     const [switchDay, setSwitchDay] = useState('');
     const [daysUntilSwitch, setDaysUntilSwitch] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [pendingDayIndex, setPendingDayIndex] = useState(null);
     const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
@@ -264,12 +398,25 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
         <div style={{ padding: '20px', maxWidth: '100%' }}>
 
             {/* ── Greeting ─────────────────────────────────────────────── */}
-            <p style={{
-                margin: '2px 0 20px 0',
-                fontSize: '1.4rem',
-                fontWeight: 700,
-                color: 'white',
-            }}>{getGreeting()}</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', margin: '2px 0 20px 0' }}>
+                <p style={{ margin: 0, fontSize: '1.4rem', fontWeight: 700, color: 'white' }}>{getGreeting()}</p>
+                <button
+                    onClick={() => setIsCalendarOpen(true)}
+                    title="לוח שבועות וחודשים"
+                    style={{
+                        flexShrink: 0,
+                        width: '40px', height: '40px',
+                        borderRadius: '13px',
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.09)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                    }}
+                >
+                    <CalendarDays size={19} color="#00e5ff" />
+                </button>
+            </div>
 
             {/* ── Week ring ─────────────────────────────────────────────── */}
             <div style={{ display: 'flex', justifyContent: 'center', padding: '0 0 20px', position: 'relative' }}>
@@ -496,6 +643,11 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
                     <button onClick={() => setCurrentWeek(Math.min(40, currentWeek + 4))} style={{ padding: '5px 10px', background: '#1e293b', border: '1px solid #334155', color: '#94a3b8', borderRadius: '5px', cursor: 'pointer' }}>+ חודש</button>
                 </div>
             </div>
+
+            {/* ── Week/month calendar modal ────────────────────────────── */}
+            {isCalendarOpen && (
+                <WeekCalendarModal currentWeek={currentWeek} onClose={() => setIsCalendarOpen(false)} />
+            )}
 
             {/* ── Day picker modal ─────────────────────────────────────── */}
             {isEditModalOpen && (
