@@ -94,45 +94,55 @@ const OpsLog = ({ currentWeek }) => {
     return (
         <div className="w-full max-w-md mx-auto relative flex flex-col font-body text-gray-100">
             {/* Header Section */}
-            <header className="pt-8 pb-6 px-6 relative z-10">
+            <header className="pt-8 pb-4 px-6 relative z-10">
                 <div className="space-y-2">
                     <div className="flex items-baseline gap-2">
                         <h1 className="font-display text-4xl font-bold text-white tracking-tight">משימות שבוע {currentWeek}</h1>
                     </div>
                     <p className="text-gray-400 text-sm font-body">אזור פיקוד ובקרה</p>
                 </div>
-
-                {/* Progress Bar */}
-                {totalTasks > 0 && (
-                    <div style={{ marginTop: '16px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                            <span style={{ fontSize: '0.8rem', color: '#64748b', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
-                                {countChecked()}/{totalTasks} משימות
-                            </span>
-                            <span style={{
-                                fontSize: '0.8rem',
-                                fontWeight: 'bold',
-                                color: progress === 100 ? '#10b981' : 'var(--primary)',
-                                fontFamily: 'monospace'
-                            }}>
-                                {progress}%
-                            </span>
-                        </div>
-                        <div style={{ height: '6px', background: 'rgba(255,255,255,0.07)', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{
-                                height: '100%',
-                                width: `${progress}%`,
-                                background: progress === 100
-                                    ? 'linear-gradient(90deg, #10b981, #34d399)'
-                                    : 'linear-gradient(90deg, var(--primary), #00f3ff)',
-                                borderRadius: '3px',
-                                transition: 'width 0.5s ease',
-                                boxShadow: progress === 100 ? '0 0 8px rgba(16,185,129,0.5)' : '0 0 8px rgba(25,127,230,0.4)'
-                            }} />
-                        </div>
-                    </div>
-                )}
             </header>
+
+            {/* Sticky live progress bar — stays pinned at the top while scrolling the
+                task list, so checking off a task shows the fill update instantly. */}
+            {totalTasks > 0 && (
+                <div style={{
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 40,
+                    background: 'rgba(17,25,33,0.88)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    padding: '10px 24px',
+                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <span style={{ fontSize: '0.8rem', color: '#64748b', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+                            {countChecked()}/{totalTasks} משימות
+                        </span>
+                        <span style={{
+                            fontSize: '0.8rem',
+                            fontWeight: 'bold',
+                            color: progress === 100 ? '#10b981' : 'var(--primary)',
+                            fontFamily: 'monospace'
+                        }}>
+                            {progress}%
+                        </span>
+                    </div>
+                    <div style={{ height: '6px', background: 'rgba(255,255,255,0.07)', borderRadius: '3px', overflow: 'hidden' }}>
+                        <div style={{
+                            height: '100%',
+                            width: `${progress}%`,
+                            background: progress === 100
+                                ? 'linear-gradient(90deg, #10b981, #34d399)'
+                                : 'linear-gradient(90deg, var(--primary), #00f3ff)',
+                            borderRadius: '3px',
+                            transition: 'width 0.5s ease',
+                            boxShadow: progress === 100 ? '0 0 8px rgba(16,185,129,0.5)' : '0 0 8px rgba(25,127,230,0.4)'
+                        }} />
+                    </div>
+                </div>
+            )}
 
             <RegistrationGate
                 locked={tasksLocked}

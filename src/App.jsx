@@ -295,11 +295,11 @@ const Header = () => {
         {/* Main Nav */}
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px 16px 0' }}>
           {[
-            { to: '/timer', icon: Clock, label: 'תזמון צירים', color: '#38bdf8', bg: 'rgba(56,189,248,0.1)', border: 'rgba(56,189,248,0.2)' },
-            { to: '/bag', icon: ShoppingBag, label: 'תיק לחדר לידה', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.2)' },
-            { to: '/belly', icon: Camera, label: 'מעקב בטן', color: '#fb7185', bg: 'rgba(251,113,133,0.1)', border: 'rgba(251,113,133,0.2)' },
             { to: '/saved', icon: Bookmark, label: 'מאמרים שמורים', color: '#fbbf24', bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.2)' },
             { to: '/jokes', icon: Smile, label: 'בדיחות אבא', color: '#4ade80', bg: 'rgba(74,222,128,0.1)', border: 'rgba(74,222,128,0.2)' },
+            { to: '/belly', icon: Camera, label: 'מעקב בטן', color: '#fb7185', bg: 'rgba(251,113,133,0.1)', border: 'rgba(251,113,133,0.2)' },
+            { to: '/bag', icon: ShoppingBag, label: 'תיק לחדר לידה', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.2)' },
+            { to: '/timer', icon: Clock, label: 'תזמון צירים', color: '#38bdf8', bg: 'rgba(56,189,248,0.1)', border: 'rgba(56,189,248,0.2)' },
           ].map(({ to, icon: Icon, label, color, bg, border }) => (
             <Link key={to} to={to} onClick={() => setIsMenuOpen(false)} style={{
               textDecoration: 'none', color: 'white',
