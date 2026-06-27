@@ -18,7 +18,7 @@ const BabySizeIcon = ({ week, emoji }) => {
             src={`/images/week${week}.png`}
             alt=""
             onError={() => setImgFailed(true)}
-            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '3px' }}
         />
     );
 };
@@ -528,12 +528,12 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
                 marginBottom: '12px',
             }}>
                 <div style={{
-                    width: '50px', height: '50px',
-                    borderRadius: '14px',
+                    width: '76px', height: '76px',
+                    borderRadius: '4px',
                     background: 'rgba(255,255,255,0.04)',
                     border: '1px solid rgba(255,255,255,0.08)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '26px',
+                    fontSize: '38px',
                     flexShrink: 0,
                 }}>
                     <BabySizeIcon week={currentWeek} emoji={getBabySizeEmoji(currentWeek)} />
