@@ -541,9 +541,11 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
                 <div>
                     <div style={{ fontSize: '10px', color: '#8896aa', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '3px' }}>גודל משוער</div>
                     <div style={{ fontSize: '17px', fontWeight: 700, color: 'white' }}>{babySize.object}</div>
-                    {babySize.weight && (
+                    {babySize.weight && babySize.weight !== 'לא ידוע' && (
                         <div style={{ fontSize: '12px', color: '#8896aa' }}>
-                            כ-{babySize.weight.replace(/[^\d]/g, '')} גרם
+                            {/* "כ-" קבוע; שאר הערך (כולל היחידה) נמשך מהטבלה — עמודה weight.
+                                מסירים "כ-" מוביל אם הוקלד בטבלה, כדי שלא ייווצר כפול. */}
+                            כ-{babySize.weight.trim().replace(/^כ[-\s]*/, '')}
                         </div>
                     )}
                 </div>

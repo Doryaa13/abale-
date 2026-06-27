@@ -7,7 +7,7 @@ const Onboarding = ({ onComplete }) => {
     // 0 = Benefits (Welcome), 1 = Name, 2 = Week
     const [step, setStep] = useState(0);
     const [name, setName] = useState('');
-    const [week, setWeek] = useState(1);
+    const [week, setWeek] = useState(3);
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -166,7 +166,7 @@ const Onboarding = ({ onComplete }) => {
                     {/* Slider Input */}
                     <input
                         type="range"
-                        min="1"
+                        min="3"
                         max="40"
                         value={week}
                         onChange={(e) => setWeek(parseInt(e.target.value))}
@@ -182,7 +182,7 @@ const Onboarding = ({ onComplete }) => {
                         }}
                     />
                     <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '300px', marginTop: '10px', color: '#64748b', fontSize: '0.8rem', direction: 'ltr' }}>
-                        <span>1</span>
+                        <span>3</span>
                         <span>40</span>
                     </div>
                 </div>
