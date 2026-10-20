@@ -1,6 +1,7 @@
 import { Calendar, Hash, ChevronDown, CalendarDays, X, Ruler, Weight, Heart, Baby } from 'lucide-react';
 import AdSense from '../components/AdSense';
 import LifeOrb from '../components/LifeOrb';
+import AuroraBackground from '../components/AuroraBackground';
 import { fetchWeeksData } from '../services/sheetsService';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';
 import { useState, useEffect } from 'react';
@@ -172,28 +173,6 @@ const WeekCalendarModal = ({ currentWeek, onClose }) => (
             ))}
         </div>
     </ModalShell>
-);
-
-// ── Ambient background: drifting light + a faint dot grid behind the hero ─────
-const AuroraBackground = () => (
-    <div className="abl-aurora" aria-hidden="true">
-        <div className="abl-grid" />
-        <span className="abl-blob" style={{
-            top: '-140px', right: '-150px', width: '440px', height: '440px',
-            background: 'radial-gradient(circle, rgba(0,229,255,0.17), transparent 62%)',
-            animationDuration: '19s',
-        }} />
-        <span className="abl-blob" style={{
-            top: '200px', left: '-190px', width: '470px', height: '470px',
-            background: 'radial-gradient(circle, rgba(139,92,246,0.15), transparent 62%)',
-            animationDuration: '24s', animationDelay: '-7s',
-        }} />
-        <span className="abl-blob" style={{
-            top: '680px', right: '-170px', width: '430px', height: '430px',
-            background: 'radial-gradient(circle, rgba(244,114,182,0.1), transparent 62%)',
-            animationDuration: '28s', animationDelay: '-13s',
-        }} />
-    </div>
 );
 
 // ── Flat progress ring — shown only if the device can't render the 3D orb ──────

@@ -611,11 +611,205 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   color: #e0fbff;
 }
 
+/* ── Tasks page ── */
+@keyframes abl-check-pop {
+  0%   { transform: scale(0.8); }
+  55%  { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+@keyframes abl-check-ring {
+  from { opacity: 0.85; transform: scale(0.8); }
+  to   { opacity: 0; transform: scale(1.7); }
+}
+@keyframes abl-confetti-fall {
+  0%   { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(var(--x), 105vh, 0) rotate(var(--r)); }
+}
+
+/* Category card — colors come from --accent* custom properties */
+.abl-task-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  padding: 16px 14px 14px;
+  background: linear-gradient(160deg, var(--accent-faint), rgba(255, 255, 255, 0.012) 60%), rgba(16, 24, 34, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.abl-task-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 25%;
+  height: 2px;
+  background: linear-gradient(270deg, var(--accent), transparent);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.abl-task-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  background: linear-gradient(160deg, var(--accent-soft), var(--accent-faint));
+  border: 1px solid var(--accent-line);
+  box-shadow: 0 0 18px -6px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.abl-task-count {
+  margin-inline-start: auto;
+  flex-shrink: 0;
+  font-family: 'Space Grotesk', 'Heebo', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.4s ease;
+}
+.abl-task-count[data-done="true"] {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 14px -4px rgba(16, 185, 129, 0.6);
+}
+
+.abl-task-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.15s ease;
+}
+.abl-task-row:active { transform: scale(0.985); }
+@media (hover: hover) {
+  .abl-task-row:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--accent-line); }
+}
+.abl-task-row[aria-checked="true"] {
+  background: var(--accent-faint);
+  border-color: var(--accent-line);
+}
+
+.abl-task-text {
+  flex: 1;
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #e2e8f0;
+  text-decoration: line-through;
+  text-decoration-color: transparent;
+  transition: color 0.35s ease, text-decoration-color 0.35s ease;
+}
+.abl-task-row[aria-checked="true"] .abl-task-text {
+  color: #64748b;
+  text-decoration-color: var(--accent);
+}
+
+/* Custom checkbox: the ✓ draws itself, then a ring ripples out */
+.abl-check {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 2px solid rgba(148, 163, 184, 0.45);
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+.abl-check svg path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  transition: stroke-dashoffset 0.35s ease 0.05s;
+}
+.abl-check::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 11px;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  pointer-events: none;
+}
+.abl-task-row[aria-checked="true"] .abl-check {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 14px var(--accent-glow);
+  animation: abl-check-pop 0.38s cubic-bezier(0.2, 0.9, 0.25, 1.2);
+}
+.abl-task-row[aria-checked="true"] .abl-check svg path { stroke-dashoffset: 0; }
+.abl-task-row[aria-checked="true"] .abl-check::after { animation: abl-check-ring 0.6s ease-out; }
+
+.abl-info-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.abl-info-btn[aria-expanded="true"] {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  box-shadow: 0 0 14px -4px var(--accent-glow);
+}
+
+.abl-task-desc {
+  margin: 6px 4px 0;
+  padding: 12px 14px;
+  border-radius: 13px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #94a3b8;
+  background: var(--accent-faint);
+  border-right: 2px solid var(--accent);
+}
+
+/* Segmented live progress (one segment per task) */
+.abl-seg {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.45s ease, box-shadow 0.45s ease;
+}
+
+/* Confetti */
+.abl-confetti {
+  position: absolute;
+  top: -24px;
+  opacity: 0;
+  animation: abl-confetti-fall 2.2s cubic-bezier(0.25, 0.6, 0.4, 1) forwards;
+}
+
 /* ── Respect reduced-motion preferences ── */
 @media (prefers-reduced-motion: reduce) {
   .abl-rise, .abl-pop, .abl-float, .abl-blob, .abl-glow-border, .abl-sheen,
   .abl-dot::after, .abl-backdrop, .abl-modal, .abl-breathe,
-  .abl-size-tile, .abl-size-shadow {
+  .abl-size-tile, .abl-size-shadow, .abl-check, .abl-check::after {
     animation: none !important;
   }
+  .abl-confetti { display: none; }
 }
