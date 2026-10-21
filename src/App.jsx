@@ -72,23 +72,31 @@ const NavOnboardingTooltip = ({ onDismiss }) => {
 };
 
 // --- Navigation Component ---
+const NAV_TABS = ['home', 'log', 'tests'];
+
 const Navigation = ({ activeTab, onTabChange }) => {
+  const activeIndex = Math.max(0, NAV_TABS.indexOf(activeTab));
   return (
-    <nav style={{
+    <nav className="abl-dock" style={{
       position: 'fixed',
-      bottom: 0,
-      left: 0,
-      right: 0,
-      backgroundColor: 'rgba(21, 31, 41, 0.98)',
-      backdropFilter: 'blur(20px)',
-      borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+      left: '12px',
+      right: '12px',
+      bottom: 'calc(8px + env(safe-area-inset-bottom))',
+      maxWidth: '456px',
+      margin: '0 auto',
+      height: '66px',
+      padding: '6px',
+      boxSizing: 'border-box',
       display: 'flex',
-      justifyContent: 'space-around',
-      alignItems: 'center',
-      height: '74px', // Increased slightly to accommodate fixed spacing
+      alignItems: 'stretch',
       zIndex: 100,
-      paddingBottom: 'env(safe-area-inset-bottom)'
     }}>
+      {/* Sliding highlight behind the active tab (first tab sits on the right in RTL) */}
+      <span aria-hidden="true" className="abl-dock-pill" style={{
+        right: '6px',
+        width: 'calc((100% - 12px) / 3)',
+        transform: `translateX(${-activeIndex * 100}%)`,
+      }} />
       <NavItem
         icon={Shield}
         label="ראשי"
@@ -102,7 +110,7 @@ const Navigation = ({ activeTab, onTabChange }) => {
         onClick={() => onTabChange('log')}
       />
       <NavItem
-        icon={({ size, ...props }) => <span {...props} className="material-symbols-outlined" style={{ fontSize: 26 }}>monitor_heart</span>}
+        icon={({ size, strokeWidth, ...props }) => <span {...props} className="material-symbols-outlined" style={{ fontSize: 24 }}>monitor_heart</span>}
         label="בדיקות"
         isActive={activeTab === 'tests'}
         onClick={() => onTabChange('tests')}
@@ -112,48 +120,17 @@ const Navigation = ({ activeTab, onTabChange }) => {
 };
 
 const NavItem = ({ icon: Icon, label, isActive, onClick }) => (
-  <button onClick={onClick} style={{
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center', // Changed to flex-start with padding to align from top? No, let's use fixed heights.
-    height: '100%',
-    padding: '4px 0 0 0',
-    background: 'transparent',
-    border: 'none',
-    color: isActive ? 'var(--primary)' : 'var(--text-muted)',
-    transition: 'all 0.3s',
-    cursor: 'pointer'
-  }}>
-    <div style={{
-      position: 'relative',
-      height: '36px', // Fixed height for icon container
-      width: '48px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: '12px',
-      background: isActive ? 'rgba(25, 127, 230, 0.1)' : 'transparent',
-      transition: 'all 0.3s',
-      marginBottom: '2px'
-    }}>
-      <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-      {isActive && (
-        <span style={{
-          position: 'absolute',
-          bottom: '2px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '4px',
-          height: '4px',
-          borderRadius: '50%',
-          background: 'var(--primary)',
-          boxShadow: '0 0 8px var(--primary)'
-        }} />
-      )}
-    </div>
-    <span style={{ fontSize: '0.7rem', fontWeight: isActive ? 600 : 400, transform: isActive ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.2s' }}>{label}</span>
+  <button
+    onClick={onClick}
+    aria-current={isActive ? 'page' : undefined}
+    className="abl-dock-item"
+    data-active={isActive}
+    style={{ background: 'transparent' }}
+  >
+    <span className="abl-dock-icon">
+      <Icon size={22} strokeWidth={isActive ? 2.4 : 2} />
+    </span>
+    <span className="abl-dock-label">{label}</span>
   </button>
 );
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, Loader2, MailCheck } from 'lucide-react';
+import { X, Mail, Lock, Loader2, MailCheck, UserPlus, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 // Inline Google "G" mark (lucide has no brand logo).
@@ -10,6 +10,14 @@ const GoogleG = ({ size = 20 }) => (
     <path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.6-5.2l-6.3-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-2.6-11.3-7l-6.5 5C9.6 39.6 16.2 44 24 44z" />
     <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.6l6.3 5.2C41.6 35.8 44 30.4 44 24c0-1.3-.1-2.3-.4-3.5z" />
   </svg>
+);
+
+// Input with a leading icon inside the glowing glass field.
+const Field = ({ icon: Icon, ...props }) => (
+  <div className="abl-input-wrap">
+    <Icon size={18} color="#64748b" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '15px', pointerEvents: 'none' }} />
+    <input {...props} dir="ltr" style={{ padding: '15px 46px 15px 15px', fontSize: '1rem' }} />
+  </div>
 );
 
 /**
@@ -26,9 +34,12 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [errorKey, setErrorKey] = useState(0); // re-triggers the shake on each new error
   const [verificationSent, setVerificationSent] = useState(false);
 
   if (!isOpen) return null;
+
+  const showError = (msg) => { setError(msg); setErrorKey(k => k + 1); };
 
   // Map Firebase's English error codes to friendly Hebrew messages.
   const messageFor = (e) => {
@@ -58,7 +69,7 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
       if (afterSuccess) afterSuccess();
       else { onSuccess?.(); onClose?.(); }
     } catch (e) {
-      setError(messageFor(e));
+      showError(messageFor(e));
     } finally {
       setBusy(false);
     }
@@ -70,16 +81,16 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!email.trim() || !password) {
-      setError('נא למלא אימייל וסיסמה');
+      showError('נא למלא אימייל וסיסמה');
       return;
     }
     if (mode === 'register') {
       if (password.length < 6) {
-        setError('הסיסמה צריכה להכיל לפחות 6 תווים');
+        showError('הסיסמה צריכה להכיל לפחות 6 תווים');
         return;
       }
       if (password !== confirmPassword) {
-        setError('הסיסמאות אינן תואמות');
+        showError('הסיסמאות אינן תואמות');
         return;
       }
       run(() => register(email.trim(), password, consent), () => setVerificationSent(true));
@@ -88,143 +99,163 @@ const AuthModal = ({ isOpen, onClose, onSuccess, headline }) => {
     }
   };
 
-  const inputStyle = {
-    width: '100%', padding: '14px 44px 14px 14px', borderRadius: '12px',
-    border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)',
-    color: 'white', outline: 'none', fontSize: '1rem', fontFamily: 'inherit',
-  };
+  const ModeIcon = mode === 'register' ? UserPlus : LogIn;
 
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 10000,
-      background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
     }}>
-      <div style={{
-        position: 'relative', width: '100%', maxWidth: '360px',
-        background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-        border: '1px solid rgba(59,130,246,0.3)', borderRadius: '24px',
-        padding: '28px 22px', boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
+      <div className="abl-backdrop" style={{
+        position: 'absolute', inset: 0,
+        background: 'rgba(3,7,14,0.8)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+      }} />
+
+      <div className="abl-modal" style={{
+        position: 'relative', width: '100%', maxWidth: '370px',
+        maxHeight: 'calc(100dvh - 40px)', overflowY: 'auto',
+        padding: '28px 22px 22px', borderRadius: '28px',
+        background: 'radial-gradient(120% 60% at 50% 0%, rgba(34,211,238,0.14), transparent 60%), linear-gradient(165deg, rgba(30,44,62,0.97), rgba(12,18,28,0.98))',
+        border: '1px solid rgba(255,255,255,0.1)',
+        boxShadow: '0 30px 80px -20px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.08)',
       }}>
-        <button onClick={verificationSent ? finishAfterRegister : onClose} style={{
-          position: 'absolute', top: '14px', left: '14px', background: 'transparent',
-          border: 'none', color: '#64748b', cursor: 'pointer',
-        }}><X size={22} /></button>
+        <button
+          onClick={verificationSent ? finishAfterRegister : onClose}
+          aria-label="סגירה"
+          style={{
+            position: 'absolute', top: '16px', left: '16px',
+            width: '34px', height: '34px', padding: 0, borderRadius: '12px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)',
+            color: '#cbd5e1', cursor: 'pointer',
+          }}
+        >
+          <X size={17} />
+        </button>
 
         {verificationSent ? (
-          <div style={{ textAlign: 'center', padding: '8px 0' }}>
-            <div style={{
-              width: '64px', height: '64px', borderRadius: '50%', margin: '6px auto 18px',
-              background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <MailCheck size={30} color="#60a5fa" />
+          <div key="verified" className="abl-step-next" style={{ textAlign: 'center', padding: '6px 0' }}>
+            <div style={{ position: 'relative', width: '84px', height: '84px', margin: '4px auto 20px' }}>
+              <div className="abl-pop" style={{
+                width: '84px', height: '84px', borderRadius: '26px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#04281c',
+                background: 'linear-gradient(145deg, #6ee7b7, #10b981)',
+                boxShadow: '0 0 40px -6px rgba(52,211,153,0.7)',
+              }}>
+                <MailCheck size={38} />
+              </div>
             </div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'white', margin: '0 0 10px' }}>
+            <h2 style={{ fontSize: '1.55rem', fontWeight: 800, color: 'white', margin: '0 0 10px', fontFamily: 'inherit' }}>
               נרשמת בהצלחה! 🎉
             </h2>
             <p style={{ color: '#cbd5e1', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 6px' }}>
               שלחנו קישור אימות לכתובת:
             </p>
-            <p style={{ color: '#60a5fa', fontSize: '0.95rem', fontWeight: 600, margin: '0 0 16px', direction: 'ltr' }}>
+            <p style={{
+              display: 'inline-block', color: '#a5f3fc', fontSize: '0.95rem', fontWeight: 700, margin: '0 0 16px', direction: 'ltr',
+              padding: '6px 14px', borderRadius: '12px',
+              background: 'rgba(34,211,238,0.08)', border: '1px solid rgba(34,211,238,0.22)',
+            }}>
               {email.trim()}
             </p>
             <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 22px' }}>
               מומלץ לאמת את הכתובת (לא חובה כדי להמשיך). לא רואה את המייל? בדוק בתיקיית הספאם.
             </p>
-            <button onClick={finishAfterRegister} style={{
-              width: '100%', padding: '15px', borderRadius: '14px',
-              background: 'var(--primary)', border: 'none', color: 'white',
-              fontSize: '1.05rem', fontWeight: 'bold', cursor: 'pointer',
-              boxShadow: '0 4px 20px rgba(59,130,246,0.4)', fontFamily: 'inherit',
-            }}>
+            <button className="abl-cta" onClick={finishAfterRegister}>
               המשך לאפליקציה
             </button>
           </div>
         ) : (
-        <>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'white', margin: '4px 0 6px', textAlign: 'center' }}>
-          {mode === 'register' ? 'הרשמה חינמית' : 'התחברות'}
-        </h2>
-        <p style={{ color: '#94a3b8', fontSize: '0.95rem', textAlign: 'center', margin: '0 0 22px' }}>
-          {headline || 'התחבר כדי לשמור ולסנכרן את ההתקדמות שלך'}
-        </p>
-
-        {/* Google */}
-        <button onClick={() => run(loginWithGoogle)} disabled={busy} style={{
-          width: '100%', padding: '13px', borderRadius: '14px',
-          background: 'white', border: 'none', color: '#1f2937',
-          fontSize: '1rem', fontWeight: 700, cursor: busy ? 'wait' : 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-          fontFamily: 'inherit',
-        }}>
-          <GoogleG /> המשך עם Google
-        </button>
-
-        {/* Divider */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '18px 0' }}>
-          <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-          <span style={{ color: '#64748b', fontSize: '0.8rem' }}>או</span>
-          <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-        </div>
-
-        {/* Email / password */}
-        <form onSubmit={handleSubmit}>
-          <div style={{ position: 'relative', marginBottom: '12px' }}>
-            <Mail size={18} color="#64748b" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '14px' }} />
-            <input type="email" placeholder="אימייל" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} dir="ltr" />
-          </div>
-          <div style={{ position: 'relative', marginBottom: mode === 'register' ? '12px' : '14px' }}>
-            <Lock size={18} color="#64748b" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '14px' }} />
-            <input type="password" placeholder="סיסמה" value={password} onChange={(e) => setPassword(e.target.value)} style={inputStyle} dir="ltr" />
-          </div>
-
-          {mode === 'register' && (
-            <div style={{ position: 'relative', marginBottom: '14px' }}>
-              <Lock size={18} color="#64748b" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '14px' }} />
-              <input type="password" placeholder="אימות סיסמה" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} style={inputStyle} dir="ltr" />
+          <div key={mode} className="abl-step-next">
+            {/* Mode icon */}
+            <div className="abl-pop" style={{
+              width: '60px', height: '60px', borderRadius: '20px', margin: '0 auto 14px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'white',
+              background: 'linear-gradient(145deg, #22d3ee, #3b82f6)',
+              boxShadow: '0 0 32px -6px rgba(34,211,238,0.7), inset 0 1px 0 rgba(255,255,255,0.3)',
+            }}>
+              <ModeIcon size={27} />
             </div>
-          )}
 
-          {/* Marketing consent — opt-in, only on register (Israeli anti-spam law) */}
-          {mode === 'register' && (
-            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '16px', cursor: 'pointer' }}>
-              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ marginTop: '3px', accentColor: '#3b82f6', flexShrink: 0 }} />
-              <span style={{ color: '#94a3b8', fontSize: '0.82rem', lineHeight: 1.4 }}>
-                אני מאשר/ת לקבל עדכונים וטיפים במייל (אפשר לבטל בכל עת)
-              </span>
-            </label>
-          )}
+            <h2 style={{ fontSize: '1.55rem', fontWeight: 800, color: 'white', margin: '0 0 6px', textAlign: 'center', fontFamily: 'inherit' }}>
+              {mode === 'register' ? 'הרשמה חינמית' : 'התחברות'}
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '0.95rem', textAlign: 'center', margin: '0 0 22px', lineHeight: 1.5 }}>
+              {headline || 'התחבר כדי לשמור ולסנכרן את ההתקדמות שלך'}
+            </p>
 
-          {error && (
-            <p style={{ color: '#f87171', fontSize: '0.85rem', margin: '0 0 12px', textAlign: 'center' }}>{error}</p>
-          )}
+            {/* Google */}
+            <button onClick={() => run(loginWithGoogle)} disabled={busy} style={{
+              width: '100%', padding: '14px', borderRadius: '16px',
+              background: 'white', border: 'none', color: '#1f2937',
+              fontSize: '1rem', fontWeight: 700, cursor: busy ? 'wait' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+              fontFamily: 'inherit',
+              boxShadow: '0 12px 28px -12px rgba(255,255,255,0.35)',
+            }}>
+              <GoogleG /> המשך עם Google
+            </button>
 
-          <button type="submit" disabled={busy} style={{
-            width: '100%', padding: '15px', borderRadius: '14px',
-            background: 'var(--primary)', border: 'none', color: 'white',
-            fontSize: '1.05rem', fontWeight: 'bold', cursor: busy ? 'wait' : 'pointer',
-            boxShadow: '0 4px 20px rgba(59,130,246,0.4)', fontFamily: 'inherit',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-          }}>
-            {busy && <Loader2 size={18} className="spin" />}
-            {mode === 'register' ? 'הרשמה' : 'התחברות'}
-          </button>
-        </form>
+            {/* Divider */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', margin: '18px 0' }}>
+              <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.14))' }} />
+              <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>או</span>
+              <div style={{ flex: 1, height: '1px', background: 'linear-gradient(270deg, transparent, rgba(255,255,255,0.14))' }} />
+            </div>
 
-        {/* Toggle mode */}
-        <p style={{ color: '#94a3b8', fontSize: '0.9rem', textAlign: 'center', margin: '18px 0 0' }}>
-          {mode === 'register' ? 'כבר יש לך חשבון?' : 'עדיין אין לך חשבון?'}{' '}
-          <button onClick={() => { setMode(mode === 'register' ? 'login' : 'register'); setError(''); setConfirmPassword(''); }} style={{
-            background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer',
-            fontWeight: 700, fontFamily: 'inherit', fontSize: '0.9rem',
-          }}>
-            {mode === 'register' ? 'התחבר' : 'הירשם'}
-          </button>
-        </p>
+            {/* Email / password */}
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '11px' }}>
+              <Field icon={Mail} type="email" placeholder="אימייל" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Field icon={Lock} type="password" placeholder="סיסמה" value={password} onChange={(e) => setPassword(e.target.value)} />
 
-        <style>{`.spin { animation: authspin 0.8s linear infinite; } @keyframes authspin { to { transform: rotate(360deg); } }`}</style>
-        </>
+              {mode === 'register' && (
+                <div className="abl-rise" style={{ '--d': '80ms' }}>
+                  <Field icon={Lock} type="password" placeholder="אימות סיסמה" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                </div>
+              )}
+
+              {/* Marketing consent — opt-in, only on register (Israeli anti-spam law) */}
+              {mode === 'register' && (
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '9px', margin: '3px 2px 2px', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ marginTop: '3px', width: '16px', height: '16px', accentColor: '#22d3ee', flexShrink: 0 }} />
+                  <span style={{ color: '#94a3b8', fontSize: '0.82rem', lineHeight: 1.45 }}>
+                    אני מאשר/ת לקבל עדכונים וטיפים במייל (אפשר לבטל בכל עת)
+                  </span>
+                </label>
+              )}
+
+              {error && (
+                <p key={errorKey} className="abl-shake" style={{
+                  color: '#fca5a5', fontSize: '0.86rem', margin: '2px 0 0', textAlign: 'center',
+                  padding: '9px 12px', borderRadius: '12px',
+                  background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.25)',
+                }}>{error}</p>
+              )}
+
+              <button type="submit" className="abl-cta" disabled={busy} style={{
+                marginTop: '4px', padding: '15px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              }}>
+                {busy && <Loader2 size={18} className="spin" />}
+                {mode === 'register' ? 'הרשמה' : 'התחברות'}
+              </button>
+            </form>
+
+            {/* Toggle mode */}
+            <p style={{ color: '#94a3b8', fontSize: '0.9rem', textAlign: 'center', margin: '18px 0 0' }}>
+              {mode === 'register' ? 'כבר יש לך חשבון?' : 'עדיין אין לך חשבון?'}{' '}
+              <button onClick={() => { setMode(mode === 'register' ? 'login' : 'register'); setError(''); setConfirmPassword(''); }} style={{
+                background: 'none', border: 'none', color: '#67e8f9', cursor: 'pointer', padding: '2px 4px',
+                fontWeight: 800, fontFamily: 'inherit', fontSize: '0.9rem',
+              }}>
+                {mode === 'register' ? 'התחבר' : 'הירשם'}
+              </button>
+            </p>
+
+            <style>{`.spin { animation: authspin 0.8s linear infinite; } @keyframes authspin { to { transform: rotate(360deg); } }`}</style>
+          </div>
         )}
       </div>
     </div>

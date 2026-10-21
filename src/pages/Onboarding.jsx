@@ -1,7 +1,61 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, User } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { ChevronRight, User, Minus, Plus, Smartphone } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AuthModal from '../components/AuthModal';
+import AuroraBackground from '../components/AuroraBackground';
+import LifeOrb from '../components/LifeOrb';
+import { getPregnancyMonth } from '../utils/pregnancyUtils';
+import { rgba } from '../utils/accent';
+
+const DISPLAY_FONT = "'Space Grotesk', 'Heebo', sans-serif";
+const MIN_WEEK = 3;
+const MAX_WEEK = 40;
+const SLIDE_MS = 5500;
+
+const prefersReducedMotion = () =>
+    typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+// ── Shared full-screen shell (background lights + centered column) ─────────────
+const Shell = ({ children }) => (
+    <div style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'var(--bg-core)', overflow: 'hidden',
+    }}>
+        <AuroraBackground />
+        <div style={{
+            position: 'relative', zIndex: 1, height: '100%',
+            maxWidth: '480px', margin: '0 auto',
+            display: 'flex', flexDirection: 'column',
+            padding: '20px 24px calc(24px + env(safe-area-inset-bottom))',
+            boxSizing: 'border-box',
+        }}>
+            {children}
+        </div>
+    </div>
+);
+
+// Top bar for the name/week steps: back button + step indicator.
+const StepHeader = ({ onBack, active }) => (
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '44px' }}>
+        <button
+            onClick={onBack}
+            aria-label="חזרה"
+            style={{
+                position: 'absolute', right: 0, top: 0,
+                width: '44px', height: '44px', padding: 0, borderRadius: '15px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                color: 'white', cursor: 'pointer',
+            }}
+        >
+            <ChevronRight size={22} />
+        </button>
+        <div className="abl-steps" aria-hidden="true">
+            <span data-on={active >= 1} />
+            <span data-on={active >= 2} />
+        </div>
+    </div>
+);
 
 const Onboarding = ({ onComplete }) => {
     // 0 = Benefits (Welcome), 1 = Name, 2 = Week
@@ -9,7 +63,13 @@ const Onboarding = ({ onComplete }) => {
     const [name, setName] = useState('');
     const [week, setWeek] = useState(3);
     const [isLoading, setIsLoading] = useState(false);
+    const [direction, setDirection] = useState(1); // 1 = forward, -1 = back (drives the slide-in)
     const navigate = useNavigate();
+
+    const goTo = (next) => {
+        setDirection(next > step ? 1 : -1);
+        setStep(next);
+    };
 
     const handleFinish = async () => {
         setIsLoading(true);
@@ -20,7 +80,7 @@ const Onboarding = ({ onComplete }) => {
             localStorage.setItem('abale_onboarding_done', 'true');
             localStorage.setItem('abale_registration_date', new Date().toISOString());
             localStorage.setItem('abale_initial_week', week);
-            
+
             // Clean up old temp items if any
             localStorage.removeItem('abale_temp_name');
             localStorage.removeItem('abale_temp_week');
@@ -33,187 +93,207 @@ const Onboarding = ({ onComplete }) => {
         }
     };
 
+    const stepAnim = direction > 0 ? 'abl-step-next' : 'abl-step-prev';
+
     // Screen 0: Benefits Carousel (Why Register?)
     if (step === 0) {
         return (
-            <div style={{
-                position: 'fixed', inset: 0, background: 'var(--bg-core)',
-                display: 'flex', flexDirection: 'column', padding: '30px',
-                overflow: 'hidden', zIndex: 9999
-            }}>
-                <BenefitsCarousel
-                    onStart={() => setStep(1)} // Go to Name screen
-                />
-            </div>
+            <Shell>
+                <div key="s0" className={stepAnim} style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                    <BenefitsCarousel
+                        onStart={() => goTo(1)} // Go to Name screen
+                    />
+                </div>
+            </Shell>
         );
     }
 
     // Screen 1: Name Selection
     if (step === 1) {
+        const firstName = name.trim().split(' ')[0];
         return (
-            <div style={{
-                position: 'fixed', inset: 0, background: 'var(--bg-core)',
-                display: 'flex', flexDirection: 'column', padding: '30px',
-                overflow: 'hidden', zIndex: 9999
-            }}>
-                <button
-                    onClick={() => setStep(0)}
-                    style={{
-                        position: 'absolute', top: '20px', right: '20px',
-                        background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '50%', width: '44px', height: '44px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', color: 'white', zIndex: 10
-                    }}
+            <Shell>
+                <StepHeader onBack={() => goTo(0)} active={1} />
+
+                <form
+                    key="s1"
+                    className={stepAnim}
+                    onSubmit={(e) => { e.preventDefault(); if (name.trim()) goTo(2); }}
+                    style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
                 >
-                    <ChevronRight size={24} />
-                </button>
-
-                <div style={{ marginTop: '60px', marginBottom: '40px', textAlign: 'center' }}>
-                    <h2 style={{ fontSize: '2rem', marginBottom: '10px' }}>איך קוראים לך?</h2>
-                    <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>שנדע איך לפנות אליך</p>
-                </div>
-
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="input-group" style={{ width: '100%', maxWidth: '300px', position: 'relative' }}>
-                        <User size={20} color="#64748b" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '16px' }} />
-                        <input
-                            type="text"
-                            placeholder="שם ההורה"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            style={{
-                                width: '100%', padding: '16px 50px 16px 16px', borderRadius: '12px',
-                                border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)',
-                                color: 'white', outline: 'none', fontSize: '1.1rem'
-                            }}
-                            autoFocus
-                        />
+                    <div style={{ marginTop: '44px', textAlign: 'center' }}>
+                        <h2 style={{ fontSize: '2.1rem', fontWeight: 800, margin: '0 0 10px', letterSpacing: '-0.02em', fontFamily: 'inherit' }}>
+                            איך קוראים לך?
+                        </h2>
+                        <p style={{ color: '#94a3b8', fontSize: '1.1rem', margin: 0 }}>שנדע איך לפנות אליך</p>
                     </div>
-                </div>
 
-                <button
-                    disabled={!name.trim()}
-                    onClick={() => setStep(2)}
-                    style={{
-                        width: '100%', padding: '18px', borderRadius: '20px',
-                        background: 'var(--primary)', border: 'none', color: 'white',
-                        fontSize: '1.1rem', fontWeight: 'bold',
-                        boxShadow: '0 4px 20px rgba(59,130,246,0.4)',
-                        cursor: name.trim() ? 'pointer' : 'not-allowed',
-                        marginTop: 'auto', opacity: name.trim() ? 1 : 0.5
-                    }}
-                >
-                    המשך
-                </button>
-            </div>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '22px' }}>
+                        <div className="abl-input-wrap" style={{ width: '100%', maxWidth: '320px' }}>
+                            <span style={{
+                                position: 'absolute', top: '50%', right: '10px', transform: 'translateY(-50%)',
+                                width: '38px', height: '38px', borderRadius: '12px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                color: '#67e8f9', background: 'rgba(34,211,238,0.1)', border: '1px solid rgba(34,211,238,0.25)',
+                            }}>
+                                <User size={19} />
+                            </span>
+                            <input
+                                type="text"
+                                placeholder="שם ההורה"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                style={{ padding: '19px 60px 19px 18px', fontSize: '1.2rem', fontWeight: 600 }}
+                                autoFocus
+                            />
+                        </div>
+
+                        {/* Live greeting preview */}
+                        <div style={{ height: '48px', display: 'flex', alignItems: 'center' }}>
+                            {firstName && (
+                                <div key={firstName.length > 0 ? 'hi' : 'none'} className="abl-pop" style={{
+                                    padding: '10px 18px', borderRadius: '18px 18px 4px 18px',
+                                    fontSize: '1.15rem', fontWeight: 800, color: 'white',
+                                    background: 'linear-gradient(135deg, rgba(34,211,238,0.18), rgba(59,130,246,0.12))',
+                                    border: '1px solid rgba(34,211,238,0.3)',
+                                    boxShadow: '0 12px 30px -14px rgba(34,211,238,0.7)',
+                                }}>
+                                    היי, {firstName}! 👋
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <button type="submit" className="abl-cta" disabled={!name.trim()}>
+                        המשך
+                    </button>
+                </form>
+            </Shell>
         );
     }
 
     // Screen 2: Week Selection
     if (step === 2) {
+        const pct = ((week - MIN_WEEK) / (MAX_WEEK - MIN_WEEK)) * 100;
         return (
-            <div style={{
-                position: 'fixed', inset: 0, background: 'var(--bg-core)',
-                display: 'flex', flexDirection: 'column', padding: '30px',
-                overflow: 'hidden', zIndex: 9999
-            }}>
-                {/* Back Button */}
-                <button
-                    onClick={() => setStep(1)}
-                    style={{
-                        position: 'absolute', top: '20px', right: '20px',
-                        background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '50%', width: '44px', height: '44px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', color: 'white', zIndex: 10
-                    }}
-                >
-                    <ChevronRight size={24} />
-                </button>
+            <Shell>
+                <StepHeader onBack={() => goTo(1)} active={2} />
 
-                <div style={{ marginTop: '40px', marginBottom: '60px', textAlign: 'center' }}>
-                    <h2 style={{ fontSize: '2rem', marginBottom: '10px' }}>באיזה שבוע אנחנו?</h2>
-                    <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>שאל אותה בעדינות... שלא תצא מנותק 😅</p>
-                </div>
-
-                {/* Scale / Slider */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-
-                    {/* Visual Circle */}
-                    <div style={{
-                        width: '240px',
-                        height: '240px',
-                        borderRadius: '50%',
-                        border: '4px solid rgba(59,130,246,0.2)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '40px',
-                        position: 'relative',
-                        boxShadow: '0 0 50px rgba(59,130,246,0.1)'
-                    }}>
-                        <div style={{ fontSize: '1rem', color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '2px' }}>WEEK</div>
-                        <div style={{ fontSize: '6rem', fontWeight: 900, color: 'white', lineHeight: 1 }}>{week}</div>
-
-                        {/* Progress Ring Simulation */}
-                        <svg style={{ position: 'absolute', top: -4, left: -4, width: 240, height: 240, transform: 'rotate(-90deg)' }}>
-                            <circle cx="120" cy="120" r="118" fill="none" stroke="#3b82f6" strokeWidth="4" strokeDasharray="741" strokeDashoffset={741 - (741 * (week / 40))} strokeLinecap="round" />
-                        </svg>
+                <div key="s2" className={stepAnim} style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                    <div style={{ marginTop: '28px', textAlign: 'center' }}>
+                        <h2 style={{ fontSize: '2.1rem', fontWeight: 800, margin: '0 0 10px', letterSpacing: '-0.02em', fontFamily: 'inherit' }}>
+                            באיזה שבוע אנחנו?
+                        </h2>
+                        <p style={{ color: '#94a3b8', fontSize: '1.1rem', margin: 0 }}>שאל אותה בעדינות... שלא תצא מנותק 😅</p>
                     </div>
 
-                    {/* Slider Input */}
-                    <input
-                        type="range"
-                        min="3"
-                        max="40"
-                        value={week}
-                        onChange={(e) => setWeek(parseInt(e.target.value))}
-                        style={{
-                            width: '100%',
-                            maxWidth: '300px',
-                            accentColor: '#3b82f6',
-                            height: '6px',
-                            background: 'rgba(255,255,255,0.1)',
-                            borderRadius: '10px',
-                            cursor: 'pointer',
-                            direction: 'ltr' // Force LTR so 1 is on the left
-                        }}
-                    />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '300px', marginTop: '10px', color: '#64748b', fontSize: '0.8rem', direction: 'ltr' }}>
-                        <span>3</span>
-                        <span>40</span>
-                    </div>
-                </div>
+                    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        {/* 3D orb — beads light up as you pick the week */}
+                        <div style={{ position: 'relative', width: '100%', maxWidth: '280px', aspectRatio: '1 / 1' }}>
+                            <LifeOrb
+                                week={week}
+                                fallback={
+                                    <div style={{
+                                        position: 'absolute', inset: '14%', borderRadius: '50%',
+                                        border: '3px solid rgba(34,211,238,0.35)',
+                                        boxShadow: '0 0 40px rgba(34,211,238,0.25), inset 0 0 40px rgba(34,211,238,0.15)',
+                                    }} />
+                                }
+                            />
+                            <div style={{
+                                position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <div style={{ fontFamily: DISPLAY_FONT, fontSize: '12px', fontWeight: 700, letterSpacing: '0.3em', color: 'rgba(125,211,252,0.9)' }}>WEEK</div>
+                                <div key={week} className="abl-pop" style={{
+                                    fontFamily: DISPLAY_FONT, fontSize: '76px', fontWeight: 700, lineHeight: 1,
+                                    fontVariantNumeric: 'tabular-nums',
+                                    background: 'linear-gradient(180deg, #ffffff 35%, #8be9ff 100%)',
+                                    WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
+                                    filter: 'drop-shadow(0 0 16px rgba(0,229,255,0.35))',
+                                }}>{week}</div>
+                                <div style={{
+                                    marginTop: '8px', padding: '3px 12px', borderRadius: '999px',
+                                    fontSize: '12px', fontWeight: 700, color: '#a5f3fc',
+                                    background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.2)',
+                                }}>חודש {getPregnancyMonth(week)}</div>
+                            </div>
+                        </div>
 
-                {/* Action */}
-                <button
-                    disabled={isLoading}
-                    onClick={handleFinish}
-                    style={{
-                        width: '100%',
-                        padding: '18px',
-                        borderRadius: '20px',
-                        background: 'var(--primary)',
-                        border: 'none',
-                        color: 'white',
-                        fontSize: '1.1rem',
-                        fontWeight: 'bold',
-                        boxShadow: '0 4px 20px rgba(59,130,246,0.4)',
-                        cursor: isLoading ? 'wait' : 'pointer',
-                        marginTop: 'auto',
-                        opacity: isLoading ? 0.7 : 1
-                    }}
-                >
-                    {isLoading ? 'שומר...' : 'המשך'}
-                </button>
-            </div>
+                        {/* Slider with −/+ steppers */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', maxWidth: '340px', marginTop: '18px', direction: 'ltr' }}>
+                            <button className="abl-step-btn" onClick={() => setWeek(w => Math.max(MIN_WEEK, w - 1))} disabled={week <= MIN_WEEK} aria-label="שבוע קודם">
+                                <Minus size={20} />
+                            </button>
+                            <div style={{ flex: 1 }}>
+                                <input
+                                    type="range"
+                                    className="abl-range"
+                                    min={MIN_WEEK}
+                                    max={MAX_WEEK}
+                                    value={week}
+                                    onChange={(e) => setWeek(parseInt(e.target.value))}
+                                    style={{ '--p': `${pct}%` }}
+                                />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', color: '#64748b', fontSize: '0.8rem', fontFamily: DISPLAY_FONT }}>
+                                    <span>{MIN_WEEK}</span>
+                                    <span>{MAX_WEEK}</span>
+                                </div>
+                            </div>
+                            <button className="abl-step-btn" onClick={() => setWeek(w => Math.min(MAX_WEEK, w + 1))} disabled={week >= MAX_WEEK} aria-label="שבוע הבא">
+                                <Plus size={20} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Action */}
+                    <button className="abl-cta" disabled={isLoading} onClick={handleFinish} style={{ marginTop: '18px' }}>
+                        {isLoading ? 'שומר...' : 'המשך'}
+                    </button>
+                </div>
+            </Shell>
         );
     }
-    
+
     return null;
 };
+
+// ── Illustration for a benefit slide: floating emoji in a glass medallion,
+//    counter-rotating orbits, twinkling glints and a colored glow. ────────────
+const SPARKLES = [
+    { top: '8%', left: '22%', delay: '0s' },
+    { top: '18%', left: '84%', delay: '0.8s' },
+    { top: '72%', left: '8%', delay: '1.5s' },
+    { top: '86%', left: '70%', delay: '0.4s' },
+    { top: '46%', left: '96%', delay: '1.9s' },
+];
+const SlideArt = ({ icon, accent }) => (
+    <div style={{ position: 'relative', width: '210px', height: '210px', margin: '0 auto 22px' }} aria-hidden="true">
+        <span className="abl-breathe" style={{
+            position: 'absolute', inset: '6%', borderRadius: '50%',
+            background: `radial-gradient(circle, ${rgba(accent, 0.45)}, transparent 66%)`,
+        }} />
+        <span className="abl-orbit" style={{ inset: 0, color: accent, borderColor: rgba(accent, 0.3) }}>
+            <span className="abl-orbit-dot" />
+        </span>
+        <span className="abl-orbit abl-orbit--rev" style={{ inset: '15%', color: '#ffffff', borderColor: 'rgba(255,255,255,0.14)' }}>
+            <span className="abl-orbit-dot" style={{ width: '6px', height: '6px', marginLeft: '-3px', top: '-3px' }} />
+        </span>
+        <span style={{
+            position: 'absolute', inset: '27%', borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '3.4rem',
+            background: `radial-gradient(circle at 32% 28%, rgba(255,255,255,0.22), ${rgba(accent, 0.12)} 55%, rgba(10,15,24,0.6))`,
+            border: `1px solid ${rgba(accent, 0.45)}`,
+            boxShadow: `0 0 40px -6px ${rgba(accent, 0.7)}, inset 0 2px 0 rgba(255,255,255,0.18)`,
+        }}>
+            <span className="abl-float" style={{ display: 'inline-block', filter: `drop-shadow(0 8px 14px ${rgba(accent, 0.45)})` }}>{icon}</span>
+        </span>
+        {SPARKLES.map((s, i) => (
+            <span key={i} className="abl-sparkle" style={{ top: s.top, left: s.left, animationDelay: s.delay }} />
+        ))}
+    </div>
+);
 
 const BenefitsCarousel = ({ onStart }) => {
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -243,129 +323,103 @@ const BenefitsCarousel = ({ onStart }) => {
         {
             title: "תהפוך לאבא מושלם",
             desc: "קבל משימות שבועיות מותאמות אישית שיעזרו לך לתמוך בה ולצאת גבר.",
-            icon: "👑"
+            icon: "👑",
+            accent: '#fbbf24',
         },
         {
             title: "תיק לידה מוכן",
             desc: "צ'ק ליסט חכם לחדר לידה שלא ייתן לך לשכוח כלום (גם לא את המטען).",
-            icon: "🎒"
+            icon: "🎒",
+            accent: '#a78bfa',
         },
         {
             title: "אעזור לך להבין הכל אבאל'ה",
             desc: "בכל שבוע תקבל מידע רלוונטי ומקצועי, בגובה העיניים.",
-            icon: "⏱️"
+            icon: "⏱️",
+            accent: '#22d3ee',
         }
     ];
 
+    // Gentle auto-advance (story style). Restarts whenever the slide changes,
+    // stops on the last slide and while a dialog is open.
+    const autoplay = !prefersReducedMotion() && !isAuthOpen && !isGuestConfirmOpen;
+    useEffect(() => {
+        if (!autoplay || currentSlide >= slides.length - 1) return;
+        const t = setTimeout(() => setCurrentSlide(s => Math.min(s + 1, slides.length - 1)), SLIDE_MS);
+        return () => clearTimeout(t);
+    }, [currentSlide, autoplay, slides.length]);
+
     return (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', marginTop: '40px' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
 
-            {/* Carousel Area */}
-            <div
-                style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
-            >
-                {slides.map((slide, index) => (
-                    <div key={index} style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: `translate(-50%, -50%) translateX(${(index - currentSlide) * 110}%) scale(${currentSlide === index ? 1 : 0.8})`,
-                        width: '100%',
-                        maxWidth: '320px',
-                        // Card Style
-                        background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)',
-                        padding: '30px 20px',
-                        borderRadius: '24px',
-                        border: '1px solid rgba(59, 130, 246, 0.3)',
-                        boxShadow: currentSlide === index
-                            ? '0 0 30px rgba(59, 130, 246, 0.25), inset 0 0 20px rgba(59, 130, 246, 0.05)'
-                            : 'none',
-                        opacity: currentSlide === index ? 1 : 0.4,
-                        transition: 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center',
-                    }}>
-                        {/* Icon / Image Placeholder */}
-                        <div style={{
-                            fontSize: '4rem',
-                            marginBottom: '20px',
-                            background: 'rgba(59, 130, 246, 0.1)',
-                            width: '120px',
-                            height: '120px',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            border: '1px solid rgba(59, 130, 246, 0.3)',
-                            boxShadow: '0 0 20px rgba(59, 130, 246, 0.2)'
-                        }}>
-                            {slide.icon}
-                        </div>
-
-                        <h2 style={{ fontSize: '1.8rem', marginBottom: '10px', fontWeight: 800, color: 'white' }}>{slide.title}</h2>
-                        <p style={{ fontSize: '1rem', color: '#cbd5e1', lineHeight: 1.6 }}>{slide.desc}</p>
+            {/* Story progress */}
+            <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
+                {slides.map((_, i) => (
+                    <div key={i} className="abl-story" onClick={() => setCurrentSlide(i)}>
+                        <span
+                            key={i === currentSlide ? `active-${currentSlide}` : 'static'}
+                            style={i === currentSlide && autoplay && currentSlide < slides.length - 1
+                                ? { animation: `abl-story-fill ${SLIDE_MS}ms linear both` }
+                                : { transform: `scaleX(${i <= currentSlide ? 1 : 0})`, transition: 'transform 0.4s ease' }}
+                        />
                     </div>
                 ))}
             </div>
 
-            {/* Dots */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '40px' }}>
-                {slides.map((_, i) => (
-                    <div
-                        key={i}
-                        onClick={() => setCurrentSlide(i)}
-                        style={{
-                            width: currentSlide === i ? '24px' : '8px',
-                            height: '8px',
-                            borderRadius: '4px',
-                            background: currentSlide === i ? 'var(--primary)' : 'rgba(255,255,255,0.2)',
-                            transition: 'all 0.3s',
-                            cursor: 'pointer'
-                        }}
-                    />
-                ))}
+            {/* Brand */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '22px' }}>
+                <img src="/images/logo.png" alt="Abale" style={{ height: '34px', width: 'auto', filter: 'drop-shadow(0 0 18px rgba(34,211,238,0.35))' }} />
+            </div>
+
+            {/* Carousel Area */}
+            <div
+                style={{ flex: 1, minHeight: '430px', position: 'relative', perspective: '1000px' }}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+            >
+                {slides.map((slide, index) => {
+                    const offset = index - currentSlide;
+                    const isActive = offset === 0;
+                    return (
+                        <div key={index} style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            width: '100%',
+                            maxWidth: '330px',
+                            transform: `translate(-50%, -50%) translateX(${offset * 92}%) rotateY(${offset * -32}deg) scale(${isActive ? 1 : 0.82})`,
+                            opacity: isActive ? 1 : 0.35,
+                            transition: 'transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.7s ease',
+                            padding: '30px 22px 28px',
+                            borderRadius: '30px',
+                            textAlign: 'center',
+                            background: `radial-gradient(120% 70% at 50% 0%, ${rgba(slide.accent, 0.16)}, transparent 60%), linear-gradient(165deg, rgba(30,44,62,0.92), rgba(12,18,28,0.95))`,
+                            border: `1px solid ${isActive ? rgba(slide.accent, 0.4) : 'rgba(255,255,255,0.08)'}`,
+                            boxShadow: isActive
+                                ? `0 30px 70px -24px rgba(0,0,0,0.9), 0 0 50px -18px ${rgba(slide.accent, 0.6)}, inset 0 1px 0 rgba(255,255,255,0.08)`
+                                : 'none',
+                            pointerEvents: isActive ? 'auto' : 'none',
+                        }}>
+                            <SlideArt icon={slide.icon} accent={slide.accent} />
+
+                            <h2 style={{
+                                fontSize: '1.85rem', fontWeight: 800, margin: '0 0 10px', letterSpacing: '-0.02em', lineHeight: 1.2,
+                                fontFamily: 'inherit',
+                                background: `linear-gradient(180deg, #ffffff 40%, ${slide.accent})`,
+                                WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
+                            }}>{slide.title}</h2>
+                            <p style={{ fontSize: '1.02rem', color: '#cbd5e1', lineHeight: 1.65, margin: 0 }}>{slide.desc}</p>
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-                <button
-                    onClick={() => setIsAuthOpen(true)}
-                    style={{
-                        width: '100%',
-                        padding: '16px',
-                        borderRadius: '16px',
-                        background: 'var(--primary)',
-                        border: 'none',
-                        color: 'white',
-                        fontSize: '1.1rem',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 20px rgba(59,130,246,0.3)',
-                        fontFamily: 'inherit',
-                    }}
-                >
+            <div className="abl-rise" style={{ '--d': '250ms', display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
+                <button className="abl-cta" onClick={() => setIsAuthOpen(true)}>
                     צור משתמש / התחברות
                 </button>
-                <button
-                    onClick={() => setIsGuestConfirmOpen(true)}
-                    style={{
-                        width: '100%',
-                        padding: '16px',
-                        borderRadius: '16px',
-                        background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        color: '#cbd5e1',
-                        fontSize: '1.05rem',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        fontFamily: 'inherit',
-                    }}
-                >
+                <button className="abl-ghost-btn" onClick={() => setIsGuestConfirmOpen(true)}>
                     המשך כאורח
                 </button>
             </div>
@@ -380,37 +434,43 @@ const BenefitsCarousel = ({ onStart }) => {
             {isGuestConfirmOpen && (
                 <div style={{
                     position: 'fixed', inset: 0, zIndex: 10000,
-                    background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
                 }}>
-                    <div style={{
-                        width: '100%', maxWidth: '340px',
-                        background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-                        border: '1px solid rgba(59,130,246,0.3)', borderRadius: '24px',
-                        padding: '28px 22px', boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
-                        textAlign: 'center',
+                    <div className="abl-backdrop" onClick={() => setIsGuestConfirmOpen(false)} style={{
+                        position: 'absolute', inset: 0,
+                        background: 'rgba(3,7,14,0.8)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+                    }} />
+                    <div className="abl-modal" style={{
+                        position: 'relative', width: '100%', maxWidth: '340px', textAlign: 'center',
+                        padding: '28px 22px 20px', borderRadius: '28px',
+                        background: 'radial-gradient(120% 70% at 50% 0%, rgba(251,191,36,0.12), transparent 60%), linear-gradient(165deg, rgba(30,44,62,0.97), rgba(13,20,30,0.98))',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        boxShadow: '0 30px 80px -20px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.08)',
                     }}>
-                        <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'white', margin: '0 0 12px' }}>
+                        <div className="abl-pop" style={{
+                            width: '64px', height: '64px', borderRadius: '20px', margin: '0 auto 16px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#fcd34d',
+                            background: 'linear-gradient(160deg, rgba(251,191,36,0.22), rgba(251,191,36,0.05))',
+                            border: '1px solid rgba(251,191,36,0.35)',
+                            boxShadow: '0 0 30px -6px rgba(251,191,36,0.55)',
+                        }}>
+                            <Smartphone size={28} />
+                        </div>
+                        <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'white', margin: '0 0 10px', fontFamily: 'inherit' }}>
                             המשך כאורח
                         </h2>
-                        <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: 1.6, margin: '0 0 22px' }}>
+                        <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: 1.65, margin: '0 0 22px' }}>
                             בלי הרשמה, ההתקדמות שלך נשמרת רק על המכשיר הזה - היא לא תסונכרן ולא תהיה גיבוי אם תעבור מכשיר או תמחק את האפליקציה. אפשר להירשם בכל שלב מאוחר יותר.
                         </p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <button
-                                onClick={onStart}
-                                style={{
-                                    width: '100%', padding: '14px', borderRadius: '14px',
-                                    background: 'var(--primary)', border: 'none', color: 'white',
-                                    fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', fontFamily: 'inherit',
-                                }}
-                            >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <button className="abl-cta" onClick={onStart} style={{ padding: '15px', fontSize: '1rem' }}>
                                 אני מבין, רוצה להמשיך כאורח
                             </button>
                             <button
                                 onClick={() => setIsGuestConfirmOpen(false)}
                                 style={{
-                                    width: '100%', padding: '14px', borderRadius: '14px',
+                                    width: '100%', padding: '13px', borderRadius: '14px',
                                     background: 'transparent', border: 'none', color: '#64748b',
                                     fontSize: '0.95rem', cursor: 'pointer', fontFamily: 'inherit',
                                 }}
