@@ -1,4 +1,4 @@
-import { Calendar, Hash, ChevronDown, CalendarDays, X, Ruler, Weight, Heart, Baby } from 'lucide-react';
+import { Calendar, Hash, ChevronDown, X, Ruler, Weight, Heart, Baby } from 'lucide-react';
 import AdSense from '../components/AdSense';
 import LifeOrb from '../components/LifeOrb';
 import AuroraBackground from '../components/AuroraBackground';
@@ -565,11 +565,6 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
                                 color={PREGNANCY_CALENDAR.find(t => t.trimester === trimester)?.accent || '#ccff00'}
                                 tickWidth="18px"
                             />
-                            <span className="abl-statbar-divider" aria-hidden="true" />
-                            {/* Calendar icon — signals that the strip opens something */}
-                            <span className="abl-statbar-cta" aria-hidden="true">
-                                <CalendarDays size={17} color="#00e5ff" />
-                            </span>
                         </button>
                     </div>
                 </div>

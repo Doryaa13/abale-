@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
-import { Shield, CheckCircle, Monitor, Settings, Menu, X, LogOut, Clock, ShoppingBag, Smile, User, Download, Shield as ShieldIcon, Sparkles, Bookmark, Camera } from 'lucide-react';
+import { Shield, CheckCircle, Monitor, Settings, Menu, X, Clock, ShoppingBag, Smile, User, Download, Shield as ShieldIcon, Sparkles, Bookmark, Camera, ChevronLeft, Trash2 } from 'lucide-react';
+import { rgba } from './utils/accent';
 
 // Context & Pages
 import Home from './pages/Home';
@@ -242,7 +243,7 @@ const Header = () => {
   return (
     <>
       <header style={{
-        padding: '15px 20px',
+        padding: '10px 16px 10px 20px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -257,140 +258,194 @@ const Header = () => {
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <img src="/images/logo.png" alt="Abale Logo" style={{ height: '32px', width: 'auto' }} />
         </div>
-        <button onClick={() => { setIsMenuOpen(true); loadSavedArticles(); }} style={{ background: 'transparent', border: 'none', color: 'var(--text-main)', cursor: 'pointer' }}>
-          <Menu size={28} />
+        <button
+          onClick={() => { setIsMenuOpen(true); loadSavedArticles(); }}
+          aria-label="תפריט"
+          style={{
+            width: '42px', height: '42px', padding: 0, borderRadius: '14px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)',
+            color: 'var(--text-main)', cursor: 'pointer',
+          }}
+        >
+          <Menu size={22} />
         </button>
       </header>
 
-      {/* Menu Drawer Overlay */}
-      {isMenuOpen && <div onClick={() => setIsMenuOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 100 }} />}
+      {/* Menu Drawer Overlay — fades + blurs in */}
+      <div
+        onClick={() => setIsMenuOpen(false)}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: 'rgba(3,7,14,0.6)',
+          backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
+          opacity: isMenuOpen ? 1 : 0,
+          pointerEvents: isMenuOpen ? 'auto' : 'none',
+          transition: 'opacity 0.35s ease',
+        }}
+      />
 
       {/* Menu Drawer */}
-      <div style={{
-        position: 'fixed', top: 0, left: 0, height: '100%', width: '290px',
-        background: 'rgba(10, 16, 28, 0.98)',
-        backdropFilter: 'blur(24px)',
-        borderRight: '1px solid rgba(255,255,255,0.07)',
-        boxShadow: '4px 0 40px rgba(0,0,0,0.6)',
-        zIndex: 101,
-        transform: isMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
-        transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-        display: 'flex', flexDirection: 'column', overflowY: 'auto'
-      }}>
-        {/* Drawer Header */}
-        <div style={{
-          padding: '20px 20px 16px',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'rgba(25, 127, 230, 0.05)',
-        }}>
+      <aside
+        aria-hidden={!isMenuOpen}
+        style={{
+          position: 'fixed', top: 0, left: 0, height: '100%', width: '304px', maxWidth: '86vw',
+          zIndex: 101,
+          background: 'radial-gradient(120% 45% at 0% 0%, rgba(34,211,238,0.13), transparent 60%), radial-gradient(100% 40% at 100% 100%, rgba(167,139,250,0.1), transparent 60%), linear-gradient(180deg, rgba(16,24,36,0.98), rgba(9,14,22,0.99))',
+          borderRight: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: isMenuOpen ? '12px 0 60px rgba(0,0,0,0.7)' : 'none',
+          transform: isMenuOpen ? 'translateX(0)' : 'translateX(-105%)',
+          transition: 'transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1), box-shadow 0.45s ease',
+          display: 'flex', flexDirection: 'column', overflowY: 'auto',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
+      >
+        {/* Top bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 18px 16px' }}>
           <img src="/images/logo.png" alt="Abale" style={{ height: '28px', width: 'auto' }} />
-          <button onClick={() => setIsMenuOpen(false)} style={{
-            background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
-            color: '#94a3b8', cursor: 'pointer', borderRadius: '10px',
-            width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}><X size={18} /></button>
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            aria-label="סגירה"
+            style={{
+              width: '38px', height: '38px', padding: 0, borderRadius: '13px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+              color: '#cbd5e1', cursor: 'pointer',
+            }}
+          >
+            <X size={18} />
+          </button>
         </div>
 
-        {/* Main Nav */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px 16px 0' }}>
-          {[
-            { to: '/saved', icon: Bookmark, label: 'מאמרים שמורים', color: '#fbbf24', bg: 'rgba(251,191,36,0.1)', border: 'rgba(251,191,36,0.2)' },
-            { to: '/jokes', icon: Smile, label: 'בדיחות אבא', color: '#4ade80', bg: 'rgba(74,222,128,0.1)', border: 'rgba(74,222,128,0.2)' },
-            { to: '/belly', icon: Camera, label: 'מעקב בטן', color: '#fb7185', bg: 'rgba(251,113,133,0.1)', border: 'rgba(251,113,133,0.2)' },
-            { to: '/bag', icon: ShoppingBag, label: 'תיק לחדר לידה', color: '#a78bfa', bg: 'rgba(167,139,250,0.1)', border: 'rgba(167,139,250,0.2)' },
-            { to: '/timer', icon: Clock, label: 'תזמון צירים', color: '#38bdf8', bg: 'rgba(56,189,248,0.1)', border: 'rgba(56,189,248,0.2)' },
-          ].map(({ to, icon: Icon, label, color, bg, border }) => (
-            <Link key={to} to={to} onClick={() => setIsMenuOpen(false)} style={{
-              textDecoration: 'none', color: 'white',
-              display: 'flex', gap: '12px', alignItems: 'center',
-              padding: '13px 14px',
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.07)',
-              borderRadius: '14px',
-              transition: 'all 0.2s',
-              fontWeight: 500, fontSize: '0.97rem'
-            }}>
+        {/* Re-keyed on open so the items animate in every time */}
+        <div key={isMenuOpen ? 'open' : 'closed'} style={{ display: 'flex', flexDirection: 'column', gap: '18px', padding: '0 16px 20px' }}>
+
+          {/* Account */}
+          <div className="abl-drawer-item" style={{ '--d': '60ms' }}>
+            {isLoggedIn ? (
               <div style={{
-                width: '36px', height: '36px', borderRadius: '10px',
-                background: bg, border: `1px solid ${border}`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                display: 'flex', alignItems: 'center', gap: '12px',
+                padding: '13px 13px 13px 12px', borderRadius: '20px',
+                background: 'linear-gradient(160deg, rgba(59,130,246,0.16), rgba(34,211,238,0.05))',
+                border: '1px solid rgba(96,165,250,0.25)',
               }}>
-                <Icon size={18} color={color} />
+                <span style={{
+                  width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'linear-gradient(145deg, #22d3ee, #3b82f6)',
+                  color: 'white', fontSize: '18px', fontWeight: 800,
+                  boxShadow: '0 0 20px -4px rgba(34,211,238,0.6)',
+                }}>
+                  {(user?.name || user?.email || '?').trim().charAt(0).toUpperCase()}
+                </span>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <div style={{ color: '#67e8f9', fontSize: '0.74rem', fontWeight: 700 }}>מחובר</div>
+                  <div style={{ color: 'white', fontSize: '0.86rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'ltr', textAlign: 'right' }}>{user?.email}</div>
+                </div>
+                <button onClick={() => logout()} style={{
+                  background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)',
+                  color: '#fca5a5', cursor: 'pointer', borderRadius: '12px', padding: '8px 12px',
+                  fontSize: '0.82rem', fontWeight: 700, fontFamily: 'inherit', flexShrink: 0,
+                }}>התנתק</button>
               </div>
-              {label}
-            </Link>
-          ))}
-        </nav>
+            ) : (
+              <button
+                onClick={() => { setIsMenuOpen(false); setIsAuthOpen(true); }}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: '12px',
+                  padding: '12px 14px 12px 12px', borderRadius: '20px', textAlign: 'right',
+                  background: 'linear-gradient(135deg, rgba(34,211,238,0.2), rgba(59,130,246,0.14))',
+                  border: '1px solid rgba(34,211,238,0.38)',
+                  boxShadow: '0 12px 30px -14px rgba(34,211,238,0.7)',
+                  color: 'white', fontSize: '0.96rem', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer',
+                }}
+              >
+                <span style={{
+                  width: '42px', height: '42px', borderRadius: '14px', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: 'linear-gradient(145deg, #22d3ee, #3b82f6)',
+                  boxShadow: '0 0 18px -4px rgba(34,211,238,0.7)',
+                }}>
+                  <User size={20} color="white" />
+                </span>
+                <span style={{ flex: 1 }}>התחבר / גבה התקדמות</span>
+                <ChevronLeft size={18} color="#67e8f9" />
+              </button>
+            )}
+          </div>
 
-        {/* Divider */}
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.06)', margin: '16px 16px 8px' }} />
+          {/* Main screens */}
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {[
+              { to: '/saved', icon: Bookmark, label: 'מאמרים שמורים', color: '#fbbf24' },
+              { to: '/jokes', icon: Smile, label: 'בדיחות אבא', color: '#4ade80' },
+              { to: '/belly', icon: Camera, label: 'מעקב בטן', color: '#fb7185' },
+              { to: '/bag', icon: ShoppingBag, label: 'תיק לחדר לידה', color: '#a78bfa' },
+              { to: '/timer', icon: Clock, label: 'תזמון צירים', color: '#38bdf8' },
+            ].map(({ to, icon: Icon, label, color }, i) => (
+              <Link
+                key={to}
+                to={to}
+                onClick={() => setIsMenuOpen(false)}
+                className="abl-drawer-item abl-drawer-link"
+                style={{ '--d': `${130 + i * 55}ms` }}
+              >
+                <span style={{
+                  width: '40px', height: '40px', borderRadius: '13px', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: `linear-gradient(160deg, ${rgba(color, 0.24)}, ${rgba(color, 0.06)})`,
+                  border: `1px solid ${rgba(color, 0.32)}`,
+                  boxShadow: `0 0 16px -6px ${rgba(color, 0.65)}`,
+                }}>
+                  <Icon size={19} color={color} />
+                </span>
+                <span style={{ flex: 1, fontSize: '0.98rem', fontWeight: 600 }}>{label}</span>
+                {to === '/saved' && savedArticles.length > 0 && (
+                  <span style={{
+                    minWidth: '22px', height: '22px', padding: '0 6px', borderRadius: '999px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '12px', fontWeight: 800, color: '#1c1300', background: '#fbbf24',
+                    boxShadow: '0 0 12px -2px rgba(251,191,36,0.7)',
+                  }}>{savedArticles.length}</span>
+                )}
+                <ChevronLeft size={16} color="#475569" />
+              </Link>
+            ))}
+          </nav>
 
-        {/* Bottom Actions */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '0 16px 16px' }}>
-          {/* Account / Sign-in */}
-          {isLoggedIn ? (
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              gap: '8px', padding: '11px 14px', borderRadius: '12px',
-              background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', marginBottom: '4px',
-            }}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ color: '#60a5fa', fontSize: '0.72rem' }}>מחובר</div>
-                <div style={{ color: 'white', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'ltr', textAlign: 'right' }}>{user?.email}</div>
-              </div>
-              <button onClick={() => logout()} style={{
-                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                color: '#f87171', cursor: 'pointer', borderRadius: '10px', padding: '8px 12px',
-                fontSize: '0.82rem', fontFamily: 'inherit', flexShrink: 0,
-              }}>התנתק</button>
-            </div>
-          ) : (
-            <button onClick={() => { setIsMenuOpen(false); setIsAuthOpen(true); }} style={{
-              background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)', color: '#60a5fa',
-              display: 'flex', gap: '12px', alignItems: 'center',
-              textAlign: 'right', fontSize: '0.92rem', cursor: 'pointer',
-              padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit', fontWeight: 600, marginBottom: '4px',
-            }}>
-              <User size={18} /> <span>התחבר / גבה התקדמות</span>
+          {/* Secondary actions — grouped panel */}
+          <div className="abl-drawer-item" style={{
+            '--d': '430ms',
+            borderRadius: '18px', overflow: 'hidden',
+            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+          }}>
+            <button className="abl-drawer-row" onClick={() => { setIsMenuOpen(false); setIsAboutOpen(true); }} style={{ background: 'transparent', color: '#cbd5e1' }}>
+              <User size={18} color="#94a3b8" /> <span style={{ flex: 1 }}>על עצמי</span>
             </button>
-          )}
-          <button onClick={() => { setIsMenuOpen(false); setIsAboutOpen(true); }} style={{
-            background: 'none', border: 'none', color: '#94a3b8',
-            display: 'flex', gap: '12px', alignItems: 'center',
-            textAlign: 'right', fontSize: '0.92rem', cursor: 'pointer',
-            padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit',
-            transition: 'background 0.2s'
-          }}>
-            <User size={18} /> <span>על עצמי</span>
+            <button className="abl-drawer-row" onClick={() => { setIsMenuOpen(false); handleInstallClick(); }} style={{ background: 'transparent', color: '#93c5fd' }}>
+              <Download size={18} color="#60a5fa" /> <span style={{ flex: 1 }}>התקן אפליקציה</span>
+            </button>
+            <Link to="/privacy" onClick={() => setIsMenuOpen(false)} className="abl-drawer-row" style={{ color: '#94a3b8' }}>
+              <ShieldIcon size={18} color="#64748b" /> <span style={{ flex: 1 }}>מדיניות פרטיות</span>
+            </Link>
+          </div>
+
+          {/* Danger zone */}
+          <button
+            onClick={handlePurge}
+            className="abl-drawer-item"
+            style={{
+              '--d': '490ms',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              width: '100%', padding: '12px', borderRadius: '16px',
+              background: 'rgba(248,113,113,0.06)', border: '1px solid rgba(248,113,113,0.2)',
+              color: '#f87171', fontSize: '0.9rem', fontWeight: 600, fontFamily: 'inherit', cursor: 'pointer',
+            }}
+          >
+            <Trash2 size={16} /> <span>מחק נתונים</span>
           </button>
-          <button onClick={() => { setIsMenuOpen(false); handleInstallClick(); }} style={{
-            background: 'none', border: 'none', color: '#60a5fa',
-            display: 'flex', gap: '12px', alignItems: 'center',
-            textAlign: 'right', fontSize: '0.92rem', cursor: 'pointer',
-            padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit'
-          }}>
-            <Download size={18} /> <span>התקן אפליקציה</span>
-          </button>
-          <button onClick={handlePurge} style={{
-            background: 'none', border: 'none', color: '#f87171',
-            display: 'flex', gap: '12px', alignItems: 'center',
-            textAlign: 'right', fontSize: '0.92rem', cursor: 'pointer',
-            padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit',
-            marginTop: '4px'
-          }}>
-            <LogOut size={18} /> <span>מחק נתונים</span>
-          </button>
-          <Link to="/privacy" onClick={() => setIsMenuOpen(false)} style={{
-            textDecoration: 'none', color: '#64748b',
-            display: 'flex', gap: '12px', alignItems: 'center',
-            textAlign: 'right', fontSize: '0.85rem',
-            padding: '11px 14px', borderRadius: '12px', fontFamily: 'inherit',
-          }}>
-            <ShieldIcon size={16} /> <span>מדיניות פרטיות</span>
-          </Link>
         </div>
-      </div>
+      </aside>
 
       <AboutModal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
       <InstallModal isOpen={isInstallModalOpen} onClose={() => setIsInstallModalOpen(false)} onInstall={handleInstallClick} isIOS={isIOS} canPrompt={!!deferredPrompt} />

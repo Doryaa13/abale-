@@ -6,15 +6,11 @@ import AdSense from '../components/AdSense';
 import AuroraBackground from '../components/AuroraBackground';
 import { useAuth } from '../context/AuthContext';
 import RegistrationGate from '../components/RegistrationGate';
+import { hexToRgb, rgba, accentVars } from '../utils/accent';
 
 const DISPLAY_FONT = "'Space Grotesk', 'Heebo', sans-serif";
 
 // ── Visual helpers ─────────────────────────────────────────────────────────────
-const hexToRgb = (hex) => {
-    const n = parseInt(hex.slice(1), 16);
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-};
-const rgba = (hex, a) => `rgba(${hexToRgb(hex).join(',')},${a})`;
 const mixHex = (a, b, t) => {
     const [r1, g1, b1] = hexToRgb(a);
     const [r2, g2, b2] = hexToRgb(b);
@@ -34,13 +30,6 @@ const CATEGORY_THEMES = [
     { accent: '#c084fc', icon: 'female' },
     { accent: '#a3e635', icon: 'monitor_heart' },
 ];
-const accentVars = (accent) => ({
-    '--accent': accent,
-    '--accent-soft': rgba(accent, 0.2),
-    '--accent-faint': rgba(accent, 0.07),
-    '--accent-line': rgba(accent, 0.3),
-    '--accent-glow': rgba(accent, 0.45),
-});
 
 // ── Confetti burst for the "all done" moment ───────────────────────────────────
 const CONFETTI_COLORS = ['#22d3ee', '#a78bfa', '#f472b6', '#fbbf24', '#34d399', '#60a5fa'];
