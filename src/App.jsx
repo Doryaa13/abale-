@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { Shield, CheckCircle, Monitor, Settings, Menu, X, Clock, ShoppingBag, Smile, User, Download, Shield as ShieldIcon, Sparkles, Bookmark, Camera, ChevronLeft, Trash2 } from 'lucide-react';
 import { rgba } from './utils/accent';
@@ -18,10 +18,13 @@ import ArticlePage from './pages/ArticlePage';
 import SavedArticles from './pages/SavedArticles';
 import BellyGrowth from './pages/BellyGrowth';
 import PrivacyPolicy from './pages/PrivacyPolicy';
-import { fetchGuidesData } from './services/contentService';
+import { fetchGuidesData, PREVIEW } from './services/contentService';
 import { GUIDES_DATA as localGuidesData } from './services/contentService';
 import { useAuth } from './context/AuthContext';
 import AuthModal from './components/AuthModal';
+
+// The content editor is only for the admin — load it on demand.
+const Admin = lazy(() => import('./pages/Admin'));
 import { clearPhotos, migrateLegacyPhotos } from './services/photoStore';
 
 
@@ -456,7 +459,7 @@ const MainLayout = ({ currentWeek, setCurrentWeek }) => {
     // Has completed main onboarding but NOT the nav tooltip yet
     const isOnboarded = localStorage.getItem('abale_onboarding_done');
     const hasSeenNavTooltip = localStorage.getItem('abale_nav_tooltip_seen');
-    if (isOnboarded && !hasSeenNavTooltip) {
+    if (isOnboarded && !hasSeenNavTooltip && !PREVIEW) {
       // Small delay for better UX after main animation
       const timer = setTimeout(() => setShowNavTooltip(true), 1500);
       return () => clearTimeout(timer);
@@ -657,7 +660,10 @@ const AppContent = () => {
     migrateLegacyPhotos().catch((e) => console.warn('Photo migration failed', e));
   }, []);
 
+  // Preview mode (the admin editor's phone frame): show the requested week and
+  // never write anything to this device's progress.
   const [currentWeek, setCurrentWeek] = useState(() => {
+    if (PREVIEW) return PREVIEW.week || computeCurrentWeek() || 18;
     const week = computeCurrentWeek();
     if (week) localStorage.setItem('abale_user_week', week);
     return week;
@@ -667,6 +673,7 @@ const AppContent = () => {
   // session (e.g. an installed PWA returning from background) crosses the
   // switch-day boundary without needing a full reload.
   useEffect(() => {
+    if (PREVIEW) return;
     const syncWeek = () => {
       if (document.visibilityState !== 'visible') return;
       const week = computeCurrentWeek();
@@ -685,6 +692,7 @@ const AppContent = () => {
   // We only set this to true initially if we absolutely know there's no week data locally.
   const onboardingDone = localStorage.getItem('abale_onboarding_done');
   const [isOnboarding, setIsOnboarding] = useState(() => {
+    if (PREVIEW) return false;
     // A stored week means onboarding was completed — possibly on another device
     // and restored from the cloud on sign-in (the flag itself isn't synced).
     if (currentWeek && !onboardingDone) {
@@ -696,7 +704,7 @@ const AppContent = () => {
 
   // Sync week to localStorage + check for week progression modal
   useEffect(() => {
-    if (currentWeek) {
+    if (currentWeek && !PREVIEW) {
       localStorage.setItem('abale_user_week', currentWeek);
 
       // Check for week progression
@@ -723,6 +731,11 @@ const AppContent = () => {
         <Route path="/article/:id" element={<ArticlePage />} />
         <Route path="/jokes" element={<DadJokes />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/admin" element={
+          <Suspense fallback={<div style={{ minHeight: '100dvh', background: 'var(--bg-core)' }} />}>
+            <Admin />
+          </Suspense>
+        } />
 
         {/* Main App Slider or Onboarding (catch-all, must be LAST) */}
         <Route path="/*" element={
