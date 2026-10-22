@@ -229,6 +229,10 @@ const Tests = ({ currentWeek }) => {
                         <span style={{ fontSize: '14px', color: '#94a3b8' }}>מעקב רפואי ולוגיסטי - חודש {currentMonth}</span>
                         {exams.length > 0 && <ProgressChip done={doneExams} total={exams.length} />}
                     </div>
+                    <button type="button" className="abl-exams-disclaimer" onClick={() => setIsInfoModalOpen(true)}>
+                        <Info size={15} />
+                        <span>הרשימה כאן להמלצה בלבד. מה שקובע זה המרפאה שלה.</span>
+                    </button>
                 </header>
 
                 <main style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -599,13 +603,19 @@ const Tests = ({ currentWeek }) => {
 
                         <div style={{ color: '#cbd5e1', fontSize: '0.96rem', lineHeight: '1.7', textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                             <p style={{ margin: 0 }}>
-                                תשמע אחי, רוב הבדיקות שאתם הולכים לעשות (ויש הרבה) הן בגדר <strong style={{ color: 'white' }}>המלצה וסטטיסטיקה</strong>, שנועדו להוריד סיכויים למחלות ולהיות בצד הבטוח.
+                                כל מה שכתוב כאן הוא <strong style={{ color: 'white' }}>מידע כללי ולהמלצה בלבד</strong>. זה לא ייעוץ רפואי ולא תוכנית מעקב.
                             </p>
                             <p style={{ margin: 0 }}>
-                                העניין עם בדיקות הוא <strong style={{ color: 'white' }}>מאוד סובייקטיבי</strong>. הדבר הכי חשוב פה הוא שתשבו, תדברו עם בת הזוג ותחליטו <strong style={{ color: 'white' }}>ביחד</strong> מה מתאים לכם ולערכים שלכם.
+                                <strong style={{ color: 'white' }}>הכתובת האמיתית היא המרפאה שלה</strong>: הרופא או הרופאה, האחות שמלווה את ההיריון, והקופה. הם קובעים אילו בדיקות לעשות, מתי ובאיזה סדר, לפי מה שמתאים לה. אצלכם זה יכול להיות שונה מהרשימה פה, וזה בסדר.
+                            </p>
+                            <p style={{ margin: 0 }}>
+                                איך אתה עוזר: שומרים על <strong style={{ color: 'white' }}>קשר ישיר עם המרפאה</strong>, רושמים שאלות לפני כל ביקור, ובכל שאלה או חשש מתקשרים אליהם. לא מנחשים ולא מחכים.
+                            </p>
+                            <p style={{ margin: 0 }}>
+                                ועל חלק מהבדיקות מחליטים בעצמכם, אחרי שמקבלים הסבר מהצוות. תדברו, תשאלו, ותחליטו <strong style={{ color: 'white' }}>ביחד</strong>.
                             </p>
                             <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: '0.88rem' }}>
-                                בסוף, אין פה נכון או לא נכון מוחלט. תקשורת זה שם המשחק פה.
+                                משהו מרגיש לא תקין? מתקשרים לרופא או נוסעים למיון.
                             </p>
                         </div>
 

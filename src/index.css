@@ -994,6 +994,27 @@ button.abl-date-clear {
   animation: abl-check-pop 0.4s cubic-bezier(0.2, 0.9, 0.25, 1.2);
 }
 
+/* Exams page: "recommendation only, her clinic decides" line under the header */
+button.abl-exams-disclaimer,
+button.abl-exams-disclaimer:hover {
+  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: right;
+  color: #a5f3fc;
+  background: rgba(34, 211, 238, 0.07);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  cursor: pointer;
+}
+button.abl-exams-disclaimer svg { flex-shrink: 0; }
+
 /* "General info, not medical advice" note under exams and articles */
 .abl-medical-note {
   margin: 6px 4px 0;

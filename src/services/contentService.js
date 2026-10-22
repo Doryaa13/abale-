@@ -13,6 +13,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase';
 import weeksContent from '../data/content/weeks.json';
 import guidesContent from '../data/content/guides.json';
+import titleRenames from '../data/content/title-renames.json';
 
 import imgTrimesters from '../assets/images/articles/trimesters.png';
 import imgNutrition from '../assets/images/articles/nutrition.png';
@@ -71,6 +72,25 @@ const writeJSON = (key, value) => {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage full / blocked */ }
 };
 const isList = (x) => Array.isArray(x) && x.length > 0;
+
+// ── Saved-article bookmarks follow renamed articles ──────────────────────────
+// Bookmarks are keyed by article title. When an article is renamed in a content
+// update, its old → new title goes into title-renames.json and users' saved
+// bookmarks are moved over once, on launch.
+const migrateSavedTitles = () => {
+    const saved = readJSON('abale_saved_articles');
+    if (!saved || typeof saved !== 'object') return;
+    let changed = false;
+    Object.entries(titleRenames).forEach(([oldTitle, newTitle]) => {
+        if (saved[oldTitle] && !saved[newTitle]) {
+            saved[newTitle] = saved[oldTitle];
+            delete saved[oldTitle];
+            changed = true;
+        }
+    });
+    if (changed) writeJSON('abale_saved_articles', saved);
+};
+migrateSavedTitles();
 
 // ── Preview mode (the admin editor shows the app with its draft) ─────────────
 const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
