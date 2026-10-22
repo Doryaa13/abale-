@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronRight, User, Minus, Plus, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AuthModal from '../components/AuthModal';
+import { useAuth } from '../context/AuthContext';
+import { pushToCloud, upsertProfile } from '../services/syncService';
 import AuroraBackground from '../components/AuroraBackground';
 import LifeOrb from '../components/LifeOrb';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';
@@ -65,11 +67,27 @@ const Onboarding = ({ onComplete }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [direction, setDirection] = useState(1); // 1 = forward, -1 = back (drives the slide-in)
     const navigate = useNavigate();
+    const { user, loading } = useAuth();
 
     const goTo = (next) => {
         setDirection(next > step ? 1 : -1);
         setStep(next);
     };
+
+    // Already signed in but no week yet (e.g. an account whose onboarding was
+    // never finished): skip the welcome / sign-in screen and go straight to the
+    // name step. Checked once, when the session is first known — so signing up
+    // from the welcome screen still shows its "check your inbox" step.
+    const autoSkipChecked = useRef(false);
+    useEffect(() => {
+        if (loading || autoSkipChecked.current) return;
+        autoSkipChecked.current = true;
+        if (user && step === 0) {
+            if (user.name) setName((n) => n || user.name);
+            goTo(1);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading, user]);
 
     const handleFinish = async () => {
         setIsLoading(true);
@@ -85,6 +103,14 @@ const Onboarding = ({ onComplete }) => {
             localStorage.removeItem('abale_temp_name');
             localStorage.removeItem('abale_temp_week');
             localStorage.removeItem('abale_user');
+
+            // Signed in → save the name to the profile and back up the new week
+            // right away (don't wait for the app to be closed). Non-blocking.
+            if (user) {
+                upsertProfile(user.uid, { email: user.email, name: name.trim() })
+                    .then(() => pushToCloud(user.uid))
+                    .catch((e) => console.warn('Backup after onboarding failed', e));
+            }
         } catch (error) {
             console.error("Error saving onboarding data:", error);
         } finally {

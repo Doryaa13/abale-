@@ -9,7 +9,7 @@ import {
   signOut,
 } from 'firebase/auth';
 import { auth } from '../services/firebase';
-import { pushToCloud, pullFromCloud, applyCloudData, upsertProfile } from '../services/syncService';
+import { pushToCloud, pullFromCloud, applyCloudData, upsertProfile, collectLocalData, hasWeekData } from '../services/syncService';
 
 /**
  * Single source of truth for "who is logged in", backed by Firebase Auth.
@@ -17,6 +17,19 @@ import { pushToCloud, pullFromCloud, applyCloudData, upsertProfile } from '../se
  */
 
 const AuthContext = createContext(null);
+
+// Belly-growth photos live only on this device (they aren't synced). Logging out
+// keeps them, tagged with the account they belong to; they're dropped only if a
+// DIFFERENT account signs in here next.
+const PHOTOS_KEY = 'abale_belly_photos';
+const PHOTOS_OWNER_KEY = 'abale_belly_photos_owner';
+
+const reconcileLocalPhotos = (uid) => {
+  const owner = localStorage.getItem(PHOTOS_OWNER_KEY);
+  if (!owner) return;
+  if (owner !== uid) localStorage.removeItem(PHOTOS_KEY);
+  localStorage.removeItem(PHOTOS_OWNER_KEY);
+};
 
 const normalize = (fbUser) =>
   fbUser
@@ -50,17 +63,25 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   // First sign-in handling: write the profile, then reconcile data.
-  // - existing cloud data  → cloud wins: apply it locally and reload.
-  // - no cloud data yet    → push the local (guest) data up.
+  // - existing cloud data  → cloud wins: apply it locally and reload. If it holds
+  //   a pregnancy week, this account already finished onboarding, so mark it done
+  //   here (the flag itself isn't synced) — otherwise the reload would land back
+  //   on the welcome screen.
+  // - no cloud data yet    → push the local (guest) data up, if there is any.
   const handleSignIn = async (fbUser, { marketingConsent } = {}) => {
     const u = normalize(fbUser);
+    reconcileLocalPhotos(u.uid);
     try {
       await upsertProfile(u.uid, { email: u.email, name: u.name, marketingConsent });
       const cloud = await pullFromCloud(u.uid);
       if (cloud) {
         applyCloudData(cloud);
+        if (hasWeekData(cloud)) {
+          localStorage.setItem('abale_onboarding_done', 'true');
+          localStorage.setItem('abale_nav_tooltip_seen', 'true');
+        }
         window.location.reload();
-      } else {
+      } else if (Object.keys(collectLocalData()).length > 0) {
         await pushToCloud(u.uid);
       }
     } catch (e) {
@@ -91,17 +112,25 @@ export const AuthProvider = ({ children }) => {
     return handleSignIn(cred.user);
   };
 
-  const logout = async () => {
+  // `backup: false` skips the final push and `keepPhotos: false` drops the local
+  // photos too — both used by "delete data", where the user wants this device wiped.
+  const logout = async ({ backup = true, keepPhotos = true } = {}) => {
     // Back up the latest local state to the cloud BEFORE clearing it, so nothing
     // is lost — it's restored on the next sign-in.
     try {
-      if (user) await pushToCloud(user.uid);
+      if (user && backup) await pushToCloud(user.uid);
     } catch (e) {
       console.warn('Backup before logout failed', e);
     }
     await signOut(auth);
     // Clear local data (safe — it's in the cloud) and return to the welcome screen.
+    // The photos aren't in the cloud, so they stay on the device for this account.
+    const photos = keepPhotos ? localStorage.getItem(PHOTOS_KEY) : null;
     localStorage.clear();
+    if (photos) {
+      localStorage.setItem(PHOTOS_KEY, photos);
+      if (user) localStorage.setItem(PHOTOS_OWNER_KEY, user.uid);
+    }
     window.location.href = '/';
   };
 

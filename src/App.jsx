@@ -213,6 +213,12 @@ const Header = () => {
   };
 
   const handlePurge = () => {
+    // Signed in → also sign out (without backing up), so the device really starts
+    // fresh instead of landing on the welcome screen while still logged in.
+    if (isLoggedIn) {
+      logout({ backup: false, keepPhotos: false });
+      return;
+    }
     localStorage.clear();
     window.location.href = "/";
   };
@@ -668,6 +674,12 @@ const AppContent = () => {
   // We only set this to true initially if we absolutely know there's no week data locally.
   const onboardingDone = localStorage.getItem('abale_onboarding_done');
   const [isOnboarding, setIsOnboarding] = useState(() => {
+    // A stored week means onboarding was completed — possibly on another device
+    // and restored from the cloud on sign-in (the flag itself isn't synced).
+    if (currentWeek && !onboardingDone) {
+      localStorage.setItem('abale_onboarding_done', 'true');
+      return false;
+    }
     return !currentWeek || !onboardingDone;
   });
 

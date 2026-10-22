@@ -63,13 +63,21 @@ export const pushToCloud = async (uid) => {
   );
 };
 
-/** Pull the user's cloud blob. Returns null if the document doesn't exist yet. */
+/**
+ * Pull the user's cloud blob. Returns null if the document doesn't exist yet or
+ * holds no data (e.g. an account created before onboarding was finished).
+ */
 export const pullFromCloud = async (uid) => {
   if (!uid) return null;
   const snap = await getDoc(doc(db, 'user_data', uid));
   if (!snap.exists()) return null;
-  return snap.data()?.data || null;
+  const data = snap.data()?.data;
+  return data && Object.keys(data).length > 0 ? data : null;
 };
+
+/** True when a data blob holds a pregnancy week (i.e. onboarding was completed). */
+export const hasWeekData = (data) =>
+  !!data && (!!(data.abale_initial_week && data.abale_registration_date) || !!data.abale_user_week);
 
 /**
  * Create/update the marketing profile. `marketingConsent` is only written when
