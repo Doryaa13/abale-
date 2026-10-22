@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Camera, Upload, Trash2, X, Download, Share2, Play, Loader } from 'lucide-react';
+import { getAllPhotos, putPhoto, removePhoto, requestPersistentStorage } from '../services/photoStore';
 
 // ---- Confirm Modal ----
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, confirmLabel = 'מחק', confirmColor = '#ef4444' }) => {
@@ -29,13 +30,8 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, confirmLabe
 };
 
 const BellyGrowth = ({ currentWeek }) => {
-    // Photos stored as { weekNumber: base64String }
-    const [photos, setPhotos] = useState(() => {
-        try {
-            const saved = localStorage.getItem('abale_belly_photos');
-            return saved ? JSON.parse(saved) : {};
-        } catch { return {}; }
-    });
+    // Photos as { weekNumber: base64String }, loaded from the device's photo store
+    const [photos, setPhotos] = useState({});
 
     const [cameraOpen, setCameraOpen] = useState(false);
     const [cameraWeek, setCameraWeek] = useState(null);
@@ -52,15 +48,31 @@ const BellyGrowth = ({ currentWeek }) => {
 
     const photoCount = Object.keys(photos).length;
 
-    // Save photos to localStorage
     useEffect(() => {
+        let cancelled = false;
+        getAllPhotos()
+            .then((saved) => { if (!cancelled) setPhotos((prev) => ({ ...saved, ...prev })); })
+            .catch((e) => console.error('Failed to load photos:', e));
+        return () => { cancelled = true; };
+    }, []);
+
+    // Show the photo right away, then store it; roll back if storing fails.
+    const savePhoto = async (week, base64) => {
+        const previous = photos[week];
+        setPhotos(prev => ({ ...prev, [week]: base64 }));
         try {
-            localStorage.setItem('abale_belly_photos', JSON.stringify(photos));
+            await putPhoto(week, base64);
+            requestPersistentStorage();
         } catch (e) {
-            console.error('Storage full:', e);
-            alert('הזיכרון מלא! נסה למחוק תמונות ישנות.');
+            console.error('Failed to save photo:', e);
+            setPhotos(prev => {
+                const copy = { ...prev };
+                if (previous) copy[week] = previous; else delete copy[week];
+                return copy;
+            });
+            alert('לא הצלחנו לשמור את התמונה במכשיר. נסה שוב.');
         }
-    }, [photos]);
+    };
 
     // Resize image to max width to save storage
     const resizeImage = (file) => {
@@ -90,7 +102,7 @@ const BellyGrowth = ({ currentWeek }) => {
         if (!file) return;
         const base64 = await resizeImage(file);
         const week = uploadWeekRef.current;
-        setPhotos(prev => ({ ...prev, [week]: base64 }));
+        savePhoto(week, base64);
         fileInputRef.current.value = '';
     };
 
@@ -112,6 +124,7 @@ const BellyGrowth = ({ currentWeek }) => {
             delete copy[week];
             return copy;
         });
+        removePhoto(week).catch((e) => console.error('Failed to delete photo:', e));
         setViewingWeek(null);
         setConfirmState({ open: false, week: null });
     };
@@ -450,7 +463,7 @@ const BellyGrowth = ({ currentWeek }) => {
                 <CameraOverlay
                     week={cameraWeek}
                     onCapture={(base64) => {
-                        setPhotos(prev => ({ ...prev, [cameraWeek]: base64 }));
+                        savePhoto(cameraWeek, base64);
                         setCameraOpen(false);
                         setCameraWeek(null);
                     }}

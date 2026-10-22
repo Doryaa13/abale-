@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { pushToCloud, pullFromCloud, applyCloudData, upsertProfile, collectLocalData, hasWeekData } from '../services/syncService';
+import { clearPhotos, migrateLegacyPhotos } from '../services/photoStore';
 
 /**
  * Single source of truth for "who is logged in", backed by Firebase Auth.
@@ -18,16 +19,22 @@ import { pushToCloud, pullFromCloud, applyCloudData, upsertProfile, collectLocal
 
 const AuthContext = createContext(null);
 
-// Belly-growth photos live only on this device (they aren't synced). Logging out
-// keeps them, tagged with the account they belong to; they're dropped only if a
-// DIFFERENT account signs in here next.
-const PHOTOS_KEY = 'abale_belly_photos';
+// Belly-growth photos live only on this device (IndexedDB, not synced). Logging
+// out keeps them, tagged with the account they belong to; they're dropped only if
+// a DIFFERENT account signs in here next.
 const PHOTOS_OWNER_KEY = 'abale_belly_photos_owner';
 
-const reconcileLocalPhotos = (uid) => {
+const reconcileLocalPhotos = async (uid) => {
   const owner = localStorage.getItem(PHOTOS_OWNER_KEY);
   if (!owner) return;
-  if (owner !== uid) localStorage.removeItem(PHOTOS_KEY);
+  if (owner !== uid) {
+    try {
+      await clearPhotos();
+    } catch (e) {
+      console.warn("Failed to clear the previous account's photos", e);
+      return; // keep the tag so we try again on the next sign-in
+    }
+  }
   localStorage.removeItem(PHOTOS_OWNER_KEY);
 };
 
@@ -70,7 +77,7 @@ export const AuthProvider = ({ children }) => {
   // - no cloud data yet    → push the local (guest) data up, if there is any.
   const handleSignIn = async (fbUser, { marketingConsent } = {}) => {
     const u = normalize(fbUser);
-    reconcileLocalPhotos(u.uid);
+    await reconcileLocalPhotos(u.uid);
     try {
       await upsertProfile(u.uid, { email: u.email, name: u.name, marketingConsent });
       const cloud = await pullFromCloud(u.uid);
@@ -123,14 +130,18 @@ export const AuthProvider = ({ children }) => {
       console.warn('Backup before logout failed', e);
     }
     await signOut(auth);
-    // Clear local data (safe — it's in the cloud) and return to the welcome screen.
-    // The photos aren't in the cloud, so they stay on the device for this account.
-    const photos = keepPhotos ? localStorage.getItem(PHOTOS_KEY) : null;
-    localStorage.clear();
-    if (photos) {
-      localStorage.setItem(PHOTOS_KEY, photos);
-      if (user) localStorage.setItem(PHOTOS_OWNER_KEY, user.uid);
+    // Photos aren't in the cloud, so they stay on the device for this account.
+    // Make sure photos from older versions have moved out of localStorage first,
+    // since it's about to be cleared.
+    try {
+      if (keepPhotos) await migrateLegacyPhotos();
+      else await clearPhotos();
+    } catch (e) {
+      console.warn('Photo store update on logout failed', e);
     }
+    // Clear local data (safe — it's in the cloud) and return to the welcome screen.
+    localStorage.clear();
+    if (keepPhotos && user) localStorage.setItem(PHOTOS_OWNER_KEY, user.uid);
     window.location.href = '/';
   };
 

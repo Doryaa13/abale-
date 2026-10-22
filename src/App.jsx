@@ -22,6 +22,7 @@ import { fetchGuidesData } from './services/sheetsService';
 import localGuidesData from './data/guides_db.json';
 import { useAuth } from './context/AuthContext';
 import AuthModal from './components/AuthModal';
+import { clearPhotos, migrateLegacyPhotos } from './services/photoStore';
 
 
 // --- Onboarding Tooltip Overlay ---
@@ -219,8 +220,12 @@ const Header = () => {
       logout({ backup: false, keepPhotos: false });
       return;
     }
-    localStorage.clear();
-    window.location.href = "/";
+    clearPhotos()
+      .catch((e) => console.warn('Failed to clear photos', e))
+      .finally(() => {
+        localStorage.clear();
+        window.location.href = "/";
+      });
   };
 
   return (
@@ -645,6 +650,12 @@ const computeCurrentWeek = () => {
 const AppContent = () => {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [welcomeWeek, setWelcomeWeek] = useState(null);
+
+  // Move belly photos saved by older versions (localStorage) into the device's
+  // photo store right away, instead of waiting for the belly page to be opened.
+  useEffect(() => {
+    migrateLegacyPhotos().catch((e) => console.warn('Photo migration failed', e));
+  }, []);
 
   const [currentWeek, setCurrentWeek] = useState(() => {
     const week = computeCurrentWeek();
