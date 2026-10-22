@@ -889,24 +889,86 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   box-shadow: 0 0 22px -6px rgba(52, 211, 153, 0.6);
 }
 
-.abl-date-btn {
-  flex: 1;
-  min-width: 0;
+/* Exam card: the header + text area toggles the full text */
+.abl-exam-toggle {
+  position: relative;
+  cursor: pointer;
+  border-radius: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+.abl-exam-toggle:focus-visible { outline: 2px solid var(--accent-line); outline-offset: 4px; }
+.abl-exam-chevron {
+  flex-shrink: 0;
+  color: #64748b;
+  transition: transform 0.35s ease, color 0.3s ease;
+}
+.abl-exam-toggle[aria-expanded="true"] .abl-exam-chevron { transform: rotate(180deg); color: var(--accent); }
+
+/* Exam card footer: one quiet line — date on the right, done on the left */
+.abl-exam-foot {
+  position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  padding: 9px 12px 9px 10px;
-  border-radius: 16px;
-  text-align: right;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.abl-date-chip {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+.abl-date-chip[data-set="true"] {
+  background: var(--accent-faint);
+  border-color: var(--accent-line);
+}
+button.abl-date-chip-main,
+button.abl-date-chip-main:hover {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  background: none;
   font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent);
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
-.abl-date-btn[data-set="true"] { border-color: var(--accent-line); }
+.abl-date-chip-main span { overflow: hidden; text-overflow: ellipsis; }
+.abl-date-chip[data-set="true"] .abl-date-chip-main { color: #fff; padding-left: 4px; }
+.abl-date-chip[data-set="true"] .abl-date-chip-main svg { color: var(--accent); }
+button.abl-date-clear {
+  width: 26px;
+  height: 26px;
+  margin-left: 5px;
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: 9px;
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
 @media (hover: hover) {
-  .abl-date-btn:hover { border-color: var(--accent-line); box-shadow: 0 0 22px -10px var(--accent-glow); }
+  button.abl-date-clear:hover { color: #fff; background: rgba(255, 255, 255, 0.12); }
+  .abl-date-chip:not([data-set="true"]):hover { background: var(--accent-faint); }
 }
+.abl-date-clear:focus-visible, .abl-date-chip-main:focus-visible { outline: 2px solid var(--accent-line); outline-offset: 2px; }
 
 .abl-done-btn {
   width: 42px;
@@ -930,20 +992,6 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   color: #04281c;
   box-shadow: 0 0 20px -2px rgba(52, 211, 153, 0.6);
   animation: abl-check-pop 0.4s cubic-bezier(0.2, 0.9, 0.25, 1.2);
-}
-
-.abl-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 13px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  color: var(--accent);
-  border: 1px solid var(--accent-line);
 }
 
 /* Tear-off calendar tile */

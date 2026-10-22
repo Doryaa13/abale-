@@ -1,6 +1,7 @@
 import { Calendar, Hash, ChevronDown, X, Ruler, Weight, Heart, Baby } from 'lucide-react';
 import AdSense from '../components/AdSense';
-import LifeOrb from '../components/LifeOrb';
+import WeekCells from '../components/WeekCells';
+import { CELLS, COMB_CENTER, HEX_R } from '../components/combLayout';
 import AuroraBackground from '../components/AuroraBackground';
 import { fetchWeeksData } from '../services/sheetsService';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';
@@ -175,33 +176,33 @@ const WeekCalendarModal = ({ currentWeek, onClose }) => (
     </ModalShell>
 );
 
-// ── Flat progress ring — shown only if the device can't render the 3D orb ──────
-const FlatRing = ({ progress }) => {
-    // SVG ring: r=38, circumference = 2π×38 ≈ 238.76
-    const CIRC = 238.76;
-    const dashOffset = CIRC - (CIRC * progress / 100);
+// ── Flat honeycomb — shown only if the device can't render the 3D cells ────────
+const HEX_POINTS = Array.from({ length: 6 }, (_, i) => {
+    const a = Math.PI / 6 + (i * Math.PI) / 3;
+    return [Math.cos(a) * HEX_R * 0.88, Math.sin(a) * HEX_R * 0.88];
+});
+const FlatCells = ({ week }) => {
+    const [cx, cy] = COMB_CENTER;
     return (
-        <svg
-            viewBox="0 0 88 88"
-            style={{ position: 'absolute', top: '13%', left: '13%', width: '74%', height: '74%', transform: 'rotate(-90deg)' }}
-        >
-            <circle cx="44" cy="44" r="38" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4" />
-            <circle
-                cx="44" cy="44" r="38"
-                fill="none"
-                stroke="url(#ablFallbackGradient)"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeDasharray={CIRC}
-                strokeDashoffset={dashOffset}
-                style={{ filter: 'drop-shadow(0 0 6px rgba(0,229,255,0.5))', transition: 'stroke-dashoffset 0.8s ease' }}
-            />
-            <defs>
-                <linearGradient id="ablFallbackGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#00e5ff" />
-                    <stop offset="100%" stopColor="#a78bfa" />
-                </linearGradient>
-            </defs>
+        <svg viewBox="-3.6 -3.6 7.2 7.2" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
+            {CELLS.map((cell) => {
+                const t = (cell.week - 1) / 39;
+                const color = t < 0.5 ? '#00e5ff' : t < 0.8 ? '#3b82f6' : '#a78bfa';
+                const isCurrent = cell.week === week;
+                const isPast = cell.week < week;
+                const x = cell.x - cx;
+                const y = cy - cell.y;
+                return (
+                    <polygon
+                        key={cell.week}
+                        points={HEX_POINTS.map(([px, py]) => `${(x + px).toFixed(3)},${(y + py).toFixed(3)}`).join(' ')}
+                        fill={isCurrent ? '#e8fdff' : isPast ? color : 'rgba(15,23,34,0.75)'}
+                        fillOpacity={isCurrent ? 0.9 : isPast ? 0.42 : 1}
+                        stroke={isCurrent ? '#ffffff' : isPast ? color : 'rgba(148,163,184,0.3)'}
+                        strokeWidth="0.04"
+                    />
+                );
+            })}
         </svg>
     );
 };
@@ -507,14 +508,14 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
                     }}>{getGreeting()}</p>
                 </div>
 
-                {/* ── Hero: 3D life orb with the week readout ──────────── */}
+                {/* ── Hero: honeycomb of 40 week cells with the week readout ── */}
                 <div className="abl-rise" style={{
                     '--d': '90ms',
-                    position: 'relative',
-                    width: '100%', maxWidth: '330px', aspectRatio: '1 / 1',
-                    margin: '0 auto 10px',
+                    width: '100%', maxWidth: '340px',
+                    margin: '0 auto 14px',
                 }}>
-                    <LifeOrb week={currentWeek} fallback={<FlatRing progress={progress} />} />
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '1 / 1' }}>
+                    <WeekCells week={currentWeek} fallback={<FlatCells week={currentWeek} />} />
 
                     {/* Center readout */}
                     <div style={{
@@ -524,8 +525,8 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
                     }}>
                         <div style={{
                             fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em',
-                            color: 'rgba(125,211,252,0.9)', marginBottom: '2px',
-                            textShadow: '0 0 12px rgba(0,229,255,0.5)',
+                            color: 'rgba(125,211,252,0.95)', marginBottom: '2px',
+                            textShadow: '0 1px 8px rgba(2,6,12,0.9), 0 0 12px rgba(0,229,255,0.5)',
                         }}>שבוע</div>
                         <div key={currentWeek} className="abl-pop" style={{
                             fontFamily: DISPLAY_FONT,
@@ -540,13 +541,15 @@ const Home = ({ currentWeek, setCurrentWeek }) => {
                             fontSize: '10.5px', fontWeight: 600, letterSpacing: '0.2em',
                             color: '#7dd3fc', marginTop: '8px',
                             padding: '3px 10px', borderRadius: '999px',
-                            background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.2)',
+                            background: 'rgba(6,14,22,0.62)', border: '1px solid rgba(0,229,255,0.22)',
+                            backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)',
                         }}>{progress}% DONE</div>
                     </div>
+                </div>
 
                     {/* Month / trimester strip — tap to open the pregnancy calendar */}
                     <div style={{
-                        position: 'absolute', left: 0, right: 0, bottom: '2px', zIndex: 3,
+                        position: 'relative', zIndex: 3, marginTop: '4px',
                         display: 'flex', justifyContent: 'center', pointerEvents: 'none',
                     }}>
                         <button

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bookmark, BookmarkCheck, X, Info, Check, ChevronDown, Clock, CalendarDays, CalendarPlus } from 'lucide-react';
 import { fetchGuidesData, fetchWeeksData } from '../services/sheetsService';
@@ -153,6 +153,48 @@ const Tests = ({ currentWeek }) => {
     const articles = currentGuide?.articles || [];
 
     const doneExams = exams.filter(exam => examState[exam.id]?.done).length;
+
+    // The journey follows the calendar: exams with a date first (earliest on top),
+    // then the ones without a date in their original order. `index` is the exam's
+    // original position — it keeps each exam's color stable when it moves.
+    const orderedExams = exams
+        .map((exam, index) => ({ exam, index, time: parseLocalDate(examState[exam.id]?.date)?.getTime() ?? null }))
+        .sort((a, b) => {
+            if (a.time !== null && b.time !== null) return a.time - b.time || a.index - b.index;
+            if (a.time !== null) return -1;
+            if (b.time !== null) return 1;
+            return a.index - b.index;
+        });
+    const orderKey = orderedExams.map(({ exam }) => exam.id).join('|');
+
+    // When a date change reorders the journey, slide each card from its old spot
+    // to the new one (FLIP), so it's clear what moved.
+    const itemRefs = useRef({});
+    const lastTops = useRef(null);
+    const snapshotPositions = () => {
+        const tops = {};
+        Object.entries(itemRefs.current).forEach(([id, el]) => { if (el) tops[id] = el.getBoundingClientRect().top; });
+        lastTops.current = tops;
+    };
+    useLayoutEffect(() => {
+        const before = lastTops.current;
+        lastTops.current = null;
+        if (!before || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+        Object.entries(itemRefs.current).forEach(([id, el]) => {
+            if (!el || before[id] === undefined || !el.animate) return;
+            const dy = before[id] - el.getBoundingClientRect().top;
+            if (Math.abs(dy) < 1) return;
+            el.animate(
+                [{ transform: `translateY(${dy}px)` }, { transform: 'translateY(0)' }],
+                { duration: 560, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
+            );
+        });
+    }, [orderKey]);
+
+    const setExamDate = (id, date) => {
+        snapshotPositions();
+        updateExamState(id, { date });
+    };
     const thisYear = new Date().getFullYear();
 
     return (
@@ -194,11 +236,11 @@ const Tests = ({ currentWeek }) => {
                     {/* ── Exams: a journey with one station per exam ──── */}
                     {exams.length > 0 && (
                         <div>
-                            {exams.map((exam, idx) => {
+                            {orderedExams.map(({ exam, index }, idx) => {
                                 const isDone = examState[exam.id]?.done;
                                 const date = examState[exam.id]?.date;
                                 const isExpanded = expandedExamId === exam.id;
-                                const accent = EXAM_ACCENTS[idx % EXAM_ACCENTS.length];
+                                const accent = EXAM_ACCENTS[index % EXAM_ACCENTS.length];
                                 const dateObj = parseLocalDate(date);
                                 const dateLabel = dateObj
                                     ? dateObj.toLocaleDateString('he-IL', {
@@ -209,7 +251,8 @@ const Tests = ({ currentWeek }) => {
                                 const isLast = idx === exams.length - 1;
                                 // A completed exam folds to a compact card (its text opens on demand).
                                 const showInfo = !isDone || isExpanded;
-                                const collapsedMask = isExpanded ? 'none' : 'linear-gradient(180deg, #000 45%, transparent 100%)';
+                                const collapsedMask = isExpanded ? 'none' : 'linear-gradient(180deg, #000 35%, transparent 100%)';
+                                const toggleExpanded = () => setExpandedExamId(isExpanded ? null : exam.id);
 
                                 // Show an ad slot between exams (after the 2nd), only when
                                 // there are enough exams for it to actually fall in the middle.
@@ -217,7 +260,11 @@ const Tests = ({ currentWeek }) => {
 
                                 return (
                                     <React.Fragment key={exam.id || idx}>
-                                        <div className="abl-tl-item abl-rise" style={{ ...accentVars(accent), '--d': `${90 + idx * 90}ms` }}>
+                                        <div
+                                            ref={(el) => { itemRefs.current[exam.id] = el; }}
+                                            className="abl-tl-item abl-rise"
+                                            style={{ ...accentVars(accent), '--d': `${90 + idx * 90}ms` }}
+                                        >
                                             {/* Station on the rail */}
                                             <div className="abl-tl-rail">
                                                 {isDone ? (
@@ -249,79 +296,79 @@ const Tests = ({ currentWeek }) => {
                                                     pointerEvents: 'none', transition: 'background 0.5s ease',
                                                 }} />
 
-                                                {/* Header: type icon + name */}
-                                                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                    <span className="abl-exam-icon">
-                                                        <span className="material-symbols-outlined" style={{ fontSize: '25px' }}>{getExamIcon(exam.name)}</span>
-                                                    </span>
-                                                    <h3 style={{
-                                                        margin: 0, fontSize: '1.14rem', fontWeight: 800, lineHeight: 1.3, letterSpacing: '-0.01em',
-                                                        color: isDone ? '#d1fae5' : 'white', transition: 'color 0.4s ease',
-                                                    }}>
-                                                        {exam.name}
-                                                    </h3>
+                                                {/* Header + info — tap anywhere here to open / close the full text */}
+                                                <div
+                                                    className="abl-exam-toggle"
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    aria-expanded={isExpanded}
+                                                    onClick={toggleExpanded}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpanded(); }
+                                                    }}
+                                                >
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                        <span className="abl-exam-icon">
+                                                            <span className="material-symbols-outlined" style={{ fontSize: '25px' }}>{getExamIcon(exam.name)}</span>
+                                                        </span>
+                                                        <h3 style={{
+                                                            flex: 1, minWidth: 0,
+                                                            margin: 0, fontSize: '1.14rem', fontWeight: 800, lineHeight: 1.3, letterSpacing: '-0.01em',
+                                                            color: isDone ? '#d1fae5' : 'white', transition: 'color 0.4s ease',
+                                                        }}>
+                                                            {exam.name}
+                                                        </h3>
+                                                        <ChevronDown size={18} className="abl-exam-chevron" aria-hidden="true" />
+                                                    </div>
+
+                                                    {/* Info — 2 lines with a fade; hidden on completed exams until opened */}
+                                                    {showInfo && (
+                                                        <div style={{
+                                                            marginTop: '10px',
+                                                            maxHeight: isExpanded ? '600px' : '3.3em',
+                                                            overflow: 'hidden',
+                                                            transition: 'max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                            WebkitMaskImage: collapsedMask,
+                                                            maskImage: collapsedMask,
+                                                        }}>
+                                                            <p style={{ margin: 0, fontSize: '15px', lineHeight: 1.65, color: '#cbd5e1' }}>{exam.info}</p>
+                                                        </div>
+                                                    )}
                                                 </div>
 
-                                                {/* Info — ~3 lines with a fade; hidden on completed exams until opened */}
-                                                {showInfo && (
-                                                    <div style={{
-                                                        position: 'relative',
-                                                        marginTop: '12px',
-                                                        maxHeight: isExpanded ? '600px' : '5em',
-                                                        overflow: 'hidden',
-                                                        transition: 'max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                        WebkitMaskImage: collapsedMask,
-                                                        maskImage: collapsedMask,
-                                                    }}>
-                                                        <p style={{ margin: 0, fontSize: '15px', lineHeight: 1.65, color: '#cbd5e1' }}>{exam.info}</p>
+                                                {/* Footer: date (set / change / clear) + done */}
+                                                <div className="abl-exam-foot">
+                                                    {/* A finished exam without a date doesn't need the date action */}
+                                                    {isDone && !dateObj ? <span /> : (
+                                                    <div className="abl-date-chip" data-set={!!dateObj}>
+                                                        <button
+                                                            className="abl-date-chip-main"
+                                                            onClick={() => { setActiveExamId(exam.id); setIsDateModalOpen(true); }}
+                                                            aria-label={dateObj ? `תאריך הבדיקה: ${dateLabel}. לחץ לשינוי` : 'קביעת תאריך לבדיקה'}
+                                                        >
+                                                            {dateObj ? <CalendarDays size={16} /> : <CalendarPlus size={16} />}
+                                                            <span>{dateLabel || 'קביעת תאריך'}</span>
+                                                        </button>
+                                                        {dateObj && (
+                                                            <button
+                                                                className="abl-date-clear"
+                                                                onClick={() => setExamDate(exam.id, null)}
+                                                                aria-label="ניקוי התאריך"
+                                                                title="ניקוי התאריך"
+                                                            >
+                                                                <X size={14} strokeWidth={2.6} />
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                )}
-
-                                                <button
-                                                    className="abl-pill-btn"
-                                                    onClick={() => setExpandedExamId(isExpanded ? null : exam.id)}
-                                                    style={{ position: 'relative', marginTop: '10px', background: 'var(--accent-faint)' }}
-                                                >
-                                                    {isExpanded ? 'סגור' : 'קרא עוד'}
-                                                    <ChevronDown size={13} style={{ transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.35s' }} />
-                                                </button>
-
-                                                {/* Action bar: date + done */}
-                                                <div style={{ position: 'relative', display: 'flex', alignItems: 'stretch', gap: '10px', marginTop: '14px' }}>
-                                                    <button
-                                                        className="abl-date-btn"
-                                                        data-set={!!dateObj}
-                                                        onClick={() => { setActiveExamId(exam.id); setIsDateModalOpen(true); }}
-                                                        style={{ background: dateObj ? 'var(--accent-faint)' : 'rgba(255,255,255,0.03)' }}
-                                                    >
-                                                        <span style={{
-                                                            width: '34px', height: '34px', borderRadius: '11px', flexShrink: 0,
-                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                            color: 'var(--accent)', background: 'var(--accent-faint)', border: '1px solid var(--accent-line)',
-                                                        }}>
-                                                            {dateObj ? <CalendarDays size={17} /> : <CalendarPlus size={17} />}
-                                                        </span>
-                                                        <span style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                                            <span style={{ fontSize: '11px', fontWeight: 600, color: '#94a3b8' }}>תאריך הבדיקה</span>
-                                                            <span style={{
-                                                                fontSize: '13.5px', fontWeight: 700, lineHeight: 1.3,
-                                                                color: dateObj ? 'white' : 'var(--accent)',
-                                                            }}>
-                                                                {dateLabel || 'לחץ לקביעת תאריך'}
-                                                            </span>
-                                                        </span>
-                                                    </button>
+                                                    )}
                                                     <button
                                                         className="abl-done-btn"
                                                         aria-pressed={!!isDone}
                                                         aria-label="סימון שהבדיקה בוצעה"
                                                         onClick={(e) => handleToggleDone(e, exam.id, isDone)}
-                                                        style={{
-                                                            width: '54px', height: 'auto', minHeight: '54px', borderRadius: '16px',
-                                                            background: isDone ? 'linear-gradient(145deg, #6ee7b7, #10b981)' : 'rgba(0,0,0,0.25)',
-                                                        }}
+                                                        style={{ background: isDone ? 'linear-gradient(145deg, #6ee7b7, #10b981)' : 'rgba(0,0,0,0.25)' }}
                                                     >
-                                                        <Check size={24} strokeWidth={3.2} />
+                                                        <Check size={22} strokeWidth={3.2} />
                                                     </button>
                                                 </div>
                                             </article>
@@ -491,7 +538,7 @@ const Tests = ({ currentWeek }) => {
                 isOpen={isDateModalOpen}
                 onClose={() => setIsDateModalOpen(false)}
                 onSelect={(date) => {
-                    updateExamState(activeExamId, { date });
+                    setExamDate(activeExamId, date);
                     setIsDateModalOpen(false);
                 }}
                 initialDate={examState[activeExamId]?.date}
