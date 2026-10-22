@@ -5,7 +5,6 @@ import AuthModal from '../components/AuthModal';
 import { useAuth } from '../context/AuthContext';
 import { pushToCloud, upsertProfile } from '../services/syncService';
 import AuroraBackground from '../components/AuroraBackground';
-import LifeOrb from '../components/LifeOrb';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';
 import { rgba } from '../utils/accent';
 
@@ -214,36 +213,21 @@ const Onboarding = ({ onComplete }) => {
                     </div>
 
                     <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        {/* 3D orb — beads light up as you pick the week */}
-                        <div style={{ position: 'relative', width: '100%', maxWidth: '280px', aspectRatio: '1 / 1' }}>
-                            <LifeOrb
-                                week={week}
-                                fallback={
-                                    <div style={{
-                                        position: 'absolute', inset: '14%', borderRadius: '50%',
-                                        border: '3px solid rgba(34,211,238,0.35)',
-                                        boxShadow: '0 0 40px rgba(34,211,238,0.25), inset 0 0 40px rgba(34,211,238,0.15)',
-                                    }} />
-                                }
-                            />
+                        {/* Week readout */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <div style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '0.08em', color: 'rgba(125,211,252,0.9)' }}>שבוע</div>
+                            <div key={week} className="abl-pop" style={{
+                                fontFamily: DISPLAY_FONT, fontSize: '104px', fontWeight: 700, lineHeight: 1,
+                                fontVariantNumeric: 'tabular-nums',
+                                background: 'linear-gradient(180deg, #ffffff 35%, #8be9ff 100%)',
+                                WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
+                                filter: 'drop-shadow(0 0 22px rgba(0,229,255,0.35))',
+                            }}>{week}</div>
                             <div style={{
-                                position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
-                                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                            }}>
-                                <div style={{ fontFamily: DISPLAY_FONT, fontSize: '12px', fontWeight: 700, letterSpacing: '0.3em', color: 'rgba(125,211,252,0.9)' }}>WEEK</div>
-                                <div key={week} className="abl-pop" style={{
-                                    fontFamily: DISPLAY_FONT, fontSize: '76px', fontWeight: 700, lineHeight: 1,
-                                    fontVariantNumeric: 'tabular-nums',
-                                    background: 'linear-gradient(180deg, #ffffff 35%, #8be9ff 100%)',
-                                    WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
-                                    filter: 'drop-shadow(0 0 16px rgba(0,229,255,0.35))',
-                                }}>{week}</div>
-                                <div style={{
-                                    marginTop: '8px', padding: '3px 12px', borderRadius: '999px',
-                                    fontSize: '12px', fontWeight: 700, color: '#a5f3fc',
-                                    background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.2)',
-                                }}>חודש {getPregnancyMonth(week)}</div>
-                            </div>
+                                marginTop: '10px', padding: '4px 14px', borderRadius: '999px',
+                                fontSize: '13px', fontWeight: 700, color: '#a5f3fc',
+                                background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.2)',
+                            }}>חודש {getPregnancyMonth(week)}</div>
                         </div>
 
                         {/* Slider with −/+ steppers */}
