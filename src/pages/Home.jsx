@@ -3,10 +3,10 @@ import AdSense from '../components/AdSense';
 import WeekCells from '../components/WeekCells';
 import { CELLS, COMB_CENTER, HEX_R } from '../components/combLayout';
 import AuroraBackground from '../components/AuroraBackground';
-import { fetchWeeksData } from '../services/sheetsService';
+import { fetchWeeksData } from '../services/contentService';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';
 import { useState, useEffect } from 'react';
-import localWeeksData from '../data/weeks_db.json';
+import { WEEKS_DATA as localWeeksData } from '../services/contentService';
 
 const DISPLAY_FONT = "'Space Grotesk', 'Heebo', sans-serif";
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Bookmark, BookmarkX } from 'lucide-react';
-import localGuidesData from '../data/guides_db.json';
-import { fetchGuidesData } from '../services/sheetsService';
+import { GUIDES_DATA as localGuidesData } from '../services/contentService';
+import { fetchGuidesData } from '../services/contentService';
 
 const SavedArticles = () => {
     const navigate = useNavigate();

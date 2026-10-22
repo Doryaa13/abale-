@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import localWeeksData from '../data/weeks_db.json';
-import { fetchWeeksData } from '../services/sheetsService';
+import { WEEKS_DATA as localWeeksData } from '../services/contentService';
+import { fetchWeeksData } from '../services/contentService';
 import AdSense from '../components/AdSense';
 import AuroraBackground from '../components/AuroraBackground';
 import { useAuth } from '../context/AuthContext';

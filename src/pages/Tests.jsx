@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bookmark, BookmarkCheck, X, Info, Check, ChevronDown, Clock, CalendarDays, CalendarPlus } from 'lucide-react';
-import { fetchGuidesData, fetchWeeksData } from '../services/sheetsService';
-import localGuidesData from '../data/guides_db.json';
-import localWeeksData from '../data/weeks_db.json';
+import { fetchGuidesData, fetchWeeksData, MEDICAL_NOTE } from '../services/contentService';
+import { GUIDES_DATA as localGuidesData } from '../services/contentService';
+import { WEEKS_DATA as localWeeksData } from '../services/contentService';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';
 import DateModal from '../components/DateModal';
 import AdSense from '../components/AdSense';
@@ -331,7 +331,7 @@ const Tests = ({ currentWeek }) => {
                                                             WebkitMaskImage: collapsedMask,
                                                             maskImage: collapsedMask,
                                                         }}>
-                                                            <p style={{ margin: 0, fontSize: '15px', lineHeight: 1.65, color: '#cbd5e1' }}>{exam.info}</p>
+                                                            <p style={{ margin: 0, fontSize: '15px', lineHeight: 1.65, color: '#cbd5e1', whiteSpace: 'pre-line' }}>{exam.info}</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -387,6 +387,7 @@ const Tests = ({ currentWeek }) => {
                                     </React.Fragment>
                                 );
                             })}
+                            <p className="abl-medical-note">{MEDICAL_NOTE}</p>
                         </div>
                     )}
 

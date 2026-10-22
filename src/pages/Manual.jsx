@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { fetchGuidesData } from '../services/sheetsService'; // Import fetch function
-import localGuidesData from '../data/guides_db.json'; // Keep local for initial state/fallback
+import { fetchGuidesData } from '../services/contentService';
+import { GUIDES_DATA as localGuidesData } from '../services/contentService';
 import { Calendar, Info, ChevronDown, ChevronUp, User, Clock, ArrowLeft, Bookmark, BookmarkCheck } from 'lucide-react';
 import DateModal from '../components/DateModal';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';

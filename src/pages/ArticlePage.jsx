@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, Bookmark, BookmarkCheck } from 'lucide-react';
-import { fetchGuidesData } from '../services/sheetsService';
-import localGuidesData from '../data/guides_db.json';
+import { fetchGuidesData, MEDICAL_NOTE } from '../services/contentService';
+import { GUIDES_DATA as localGuidesData } from '../services/contentService';
 import { useAuth } from '../context/AuthContext';
 import RegistrationGate from '../components/RegistrationGate';
 
@@ -183,6 +183,7 @@ const ArticlePage = () => {
                 ) : (
                     <p className="text-gray-300 leading-relaxed text-base">{article.content}</p>
                 )}
+                <p className="abl-medical-note">{MEDICAL_NOTE}</p>
             </div>
             </RegistrationGate>
         </div>
