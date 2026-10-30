@@ -68,6 +68,13 @@ export const WEEK_GATE = {
     ctaOnboarded: 'לאפליקציה',
 };
 
+// Bar that stays on screen on the public pages: this is a taste, the app is the real thing.
+export const APP_PROMO = {
+    title: 'זו רק טעימה',
+    text: 'משימות, בדיקות ותיק לידה מחכים באפליקציה',
+    cta: 'מתחילים',
+};
+
 export const TRIMESTER_NAMES = { 1: 'טרימסטר ראשון', 2: 'טרימסטר שני', 3: 'טרימסטר שלישי' };
 
 /** First sentences of a text, cut to a length that fits a search-result snippet. */

@@ -5,7 +5,7 @@ import { fetchGuidesData, MEDICAL_NOTE } from '../services/contentService';
 import { GUIDES_DATA as localGuidesData } from '../services/contentService';
 import { useAuth } from '../context/AuthContext';
 import RegistrationGate from '../components/RegistrationGate';
-import { PublicFooter } from './public/PublicLayout';
+import { AppPromoBar, PublicFooter } from './public/PublicLayout';
 import { isOnboarded, usePageMeta } from './public/publicHooks';
 import { articleMeta } from '../data/sitePages';
 
@@ -202,6 +202,7 @@ const ArticlePage = () => {
             </div>
             </RegistrationGate>
             {!isOnboarded() && <PublicFooter />}
+            <AppPromoBar />
         </div>
     );
 };

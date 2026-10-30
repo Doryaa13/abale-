@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import AuroraBackground from '../../components/AuroraBackground';
-import { MEDICAL_NOTE } from '../../data/sitePages';
+import { APP_PROMO, MEDICAL_NOTE } from '../../data/sitePages';
 import { isOnboarded } from './publicHooks';
 
 const NAV = [
@@ -25,6 +25,13 @@ export const PublicFooter = () => (
     </footer>
 );
 
+export const AppPromoBar = () => (isOnboarded() ? null : (
+    <aside className="abl-pub-promo" dir="rtl">
+        <p><strong>{APP_PROMO.title}</strong><span>{APP_PROMO.text}</span></p>
+        <Link to="/start">{APP_PROMO.cta}</Link>
+    </aside>
+));
+
 const PublicLayout = ({ children }) => {
     const onboarded = isOnboarded();
     return (
@@ -43,6 +50,7 @@ const PublicLayout = ({ children }) => {
             </header>
             <main className="abl-pub-main">{children}</main>
             <PublicFooter />
+            <AppPromoBar />
         </div>
     );
 };

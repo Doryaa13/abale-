@@ -7,7 +7,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-    ABOUT, CONTACT, CONTACT_EMAIL, MEDICAL_NOTE, PAGE_META, PRIVACY, SITE_DESCRIPTION, SITE_TITLE, SITE_URL,
+    ABOUT, APP_PROMO, CONTACT, CONTACT_EMAIL, MEDICAL_NOTE, PAGE_META, PRIVACY, SITE_DESCRIPTION, SITE_TITLE, SITE_URL,
     TRIMESTER_NAMES, WEEK_GATE, articleMeta, snippet, weekMeta,
 } from '../src/data/sitePages.js';
 
@@ -30,6 +30,7 @@ const layout = (body) => `
     <nav>${link('/weeks', 'שבועות')}${link('/articles', 'מאמרים')}${link('/about', 'אודות')}${link('/contact', 'יצירת קשר')}${link('/privacy', 'מדיניות פרטיות')}</nav>
     <p>${esc(MEDICAL_NOTE)}</p>
   </footer>
+  <aside class="abl-pub-promo"><p><strong>${esc(APP_PROMO.title)}</strong><span>${esc(APP_PROMO.text)}</span></p><a href="/start">${esc(APP_PROMO.cta)}</a></aside>
 </div>`;
 
 const hero = (title, text) => `<section class="abl-pub-hero"><h1>${esc(title)}</h1>${text ? `<p>${esc(text)}</p>` : ''}</section>`;
