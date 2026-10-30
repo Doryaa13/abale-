@@ -23,8 +23,8 @@ const Landing = () => {
                 <h1>המדריך לאבא שבדרך</h1>
                 <p>מה קורה איתה, מה קורה איתו, ומה בדיוק אתה יכול לעשות השבוע. בעברית, בגובה העיניים, ובחינם.</p>
                 <div className="abl-pub-actions">
-                    <Link to="/start" className="abl-pub-btn" data-primary>מתחילים</Link>
-                    <Link to="/weeks" className="abl-pub-btn">קוראים בלי הרשמה</Link>
+                    <Link to="/start" className="abl-pub-btn abl-pub-btn-big" data-primary>מתחילים</Link>
+                    <Link to="/articles" className="abl-pub-quiet-link">או קודם לקרוא מאמרים</Link>
                 </div>
             </section>
 
@@ -34,7 +34,7 @@ const Landing = () => {
             </section>
 
             <section className="abl-pub-section">
-                <h2>מה יש כאן</h2>
+                <h2>מה מחכה באפליקציה</h2>
                 <div className="abl-pub-features">
                     {FEATURES.map((f) => (
                         <div key={f.title}>

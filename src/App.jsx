@@ -31,7 +31,6 @@ const Landing = lazy(() => import('./pages/public/Landing'));
 const WeeksIndex = lazy(() => import('./pages/public/WeeksIndex'));
 const WeekPage = lazy(() => import('./pages/public/WeekPage'));
 const ArticlesIndex = lazy(() => import('./pages/public/ArticlesIndex'));
-const ExamsPage = lazy(() => import('./pages/public/ExamsPage'));
 const AboutPage = lazy(() => import('./pages/public/AboutPage'));
 const ContactPage = lazy(() => import('./pages/public/ContactPage'));
 
@@ -755,7 +754,7 @@ const AppContent = () => {
         <Route path="/weeks" element={<WeeksIndex />} />
         <Route path="/weeks/:week" element={<WeekPage />} />
         <Route path="/articles" element={<ArticlesIndex />} />
-        <Route path="/exams" element={<ExamsPage />} />
+        <Route path="/exams" element={<Navigate to="/tests" replace />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
 

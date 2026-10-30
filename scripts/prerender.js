@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
     ABOUT, CONTACT, CONTACT_EMAIL, MEDICAL_NOTE, PAGE_META, PRIVACY, SITE_DESCRIPTION, SITE_TITLE, SITE_URL,
-    TRIMESTER_NAMES, articleMeta, snippet, weekMeta,
+    TRIMESTER_NAMES, WEEK_GATE, articleMeta, snippet, weekMeta,
 } from '../src/data/sitePages.js';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -22,12 +22,12 @@ const layout = (body) => `
 <div class="abl-pub" dir="rtl">
   <header class="abl-pub-top">
     <a href="/" class="abl-pub-logo"><img src="/images/logo.png" alt="אבאל'ה"></a>
-    <nav>${link('/weeks', 'שבועות')}${link('/articles', 'מאמרים')}${link('/exams', 'בדיקות')}</nav>
+    <nav>${link('/weeks', 'שבועות')}${link('/articles', 'מאמרים')}</nav>
     <a href="/start" class="abl-pub-top-cta">מתחילים</a>
   </header>
   <main class="abl-pub-main">${body}</main>
   <footer class="abl-pub-footer">
-    <nav>${link('/weeks', 'שבועות')}${link('/articles', 'מאמרים')}${link('/exams', 'בדיקות')}${link('/about', 'אודות')}${link('/contact', 'יצירת קשר')}${link('/privacy', 'מדיניות פרטיות')}</nav>
+    <nav>${link('/weeks', 'שבועות')}${link('/articles', 'מאמרים')}${link('/about', 'אודות')}${link('/contact', 'יצירת קשר')}${link('/privacy', 'מדיניות פרטיות')}</nav>
     <p>${esc(MEDICAL_NOTE)}</p>
   </footer>
 </div>`;
@@ -43,23 +43,21 @@ const buildPages = (weeks, guides) => {
     const add = (path, meta, body) => pages.push({ path, meta, html: layout(body) });
 
     add('/', { title: SITE_TITLE, description: SITE_DESCRIPTION }, [
-        hero('המדריך לאבא שבדרך', 'מה קורה איתה, מה קורה איתו, ומה בדיוק אתה יכול לעשות השבוע. בעברית, בגובה העיניים, ובחינם.'),
+        `<section class="abl-pub-hero"><h1>המדריך לאבא שבדרך</h1><p>מה קורה איתה, מה קורה איתו, ומה בדיוק אתה יכול לעשות השבוע. בעברית, בגובה העיניים, ובחינם.</p><div class="abl-pub-actions"><a class="abl-pub-btn abl-pub-btn-big" data-primary href="/start">מתחילים</a><a class="abl-pub-quiet-link" href="/articles">או קודם לקרוא מאמרים</a></div></section>`,
         section('באיזה שבוע אתם?', weekList(weeks.filter((w) => w.week <= 40))),
         section('מאמרים', articlesGrid(guides.slice(0, 6).map((m) => m.articles[m.month % m.articles.length]))),
         section(ABOUT.title, `<p class="abl-pub-text">${esc(ABOUT.paragraphs[1])}</p>${link('/about', 'הסיפור המלא')}`),
     ].join(''));
 
-    add('/weeks', PAGE_META.weeks, hero('כל שבועות ההיריון', 'בוחרים שבוע, ורואים מה קורה איתה, מה קורה עם התינוק, ומה המשימות שלך.')
+    add('/weeks', PAGE_META.weeks, hero('כל שבועות ההיריון', 'בוחרים שבוע, ורואים מה קורה איתה ולמה התינוק דומה בגודל. המשימות והבדיקות מחכות באפליקציה.')
         + [1, 2, 3].map((t) => section(TRIMESTER_NAMES[t], weekList(weeks.filter((w) => w.trimester === t)))).join(''));
 
     weeks.forEach((w) => {
         const month = guides.find((m) => m.month === w.month);
-        const tasks = w.tasks.map((c) => `<div class="abl-pub-tasks"><h3>${esc(c.category)}</h3><ul>${c.items.map((i) => `<li><strong>${esc(i.text)}</strong><span>${esc(i.description)}</span></li>`).join('')}</ul></div>`).join('');
         add(`/weeks/${w.week}`, weekMeta(w), [
             `<section class="abl-pub-hero"><p class="abl-pub-kicker">${esc(TRIMESTER_NAMES[w.trimester])}, חודש ${w.month}</p><h1>שבוע ${w.week} להיריון</h1><p>בגודל של ${esc(w.babySize.object)}. משקל משוער: ${esc(w.babySize.weight)}.</p></section>`,
             section('מה קורה עם בת הזוג?', paragraphs(w.partnerStatus.text)),
-            section('מה קורה עם התינוק?', paragraphs(w.babyStatus.text)),
-            section('המשימות שלך השבוע', tasks),
+            `<section class="abl-pub-gate"><h2>${esc(WEEK_GATE.title)}</h2><ul>${WEEK_GATE.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul><a class="abl-pub-btn abl-pub-btn-big" data-primary href="/start">${esc(WEEK_GATE.cta)}</a></section>`,
             month?.articles?.length ? section(`מאמרים לחודש ${w.month}`, articlesGrid(month.articles)) : '',
         ].join(''));
     });
@@ -71,10 +69,6 @@ const buildPages = (weeks, guides) => {
         add(`/article/${a.id}`, articleMeta(a), hero(a.title) + `<section class="abl-pub-section">${paragraphs(a.content)}<p class="abl-pub-text">${esc(MEDICAL_NOTE)}</p></section>`
             + section('עוד מאמרים לאותו חודש', articlesGrid(m.articles.filter((x) => x.id !== a.id))));
     }));
-
-    add('/exams', PAGE_META.exams, hero('הבדיקות בהיריון, לפי חודשים', MEDICAL_NOTE)
-        + `<p class="abl-pub-strong">הרשימה כאן להמלצה בלבד. מה שקובע זה המרפאה שלה.</p>`
-        + guides.map((m) => section(`חודש ${m.month}`, `<div class="abl-pub-exams">${m.exams.map((e) => `<article><h3>${esc(e.name)}</h3><p>${esc(e.info)}</p></article>`).join('')}</div>`)).join(''));
 
     add('/about', PAGE_META.about, hero(ABOUT.title) + `<section class="abl-pub-section">${ABOUT.paragraphs.map((p) => `<p class="abl-pub-text">${esc(p)}</p>`).join('')}</section>`);
     add('/contact', PAGE_META.contact, hero(CONTACT.title, CONTACT.intro) + `<section class="abl-pub-section"><a class="abl-pub-btn" data-primary href="mailto:${esc(CONTACT_EMAIL)}" dir="ltr">${esc(CONTACT_EMAIL)}</a><p class="abl-pub-text">${esc(CONTACT.note)}</p></section>`);

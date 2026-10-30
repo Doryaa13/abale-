@@ -60,6 +60,14 @@ export const PRIVACY = {
     ],
 };
 
+// What a public week page leaves for the app.
+export const WEEK_GATE = {
+    title: 'ההמשך של השבוע מחכה באפליקציה',
+    items: ['מה קורה עם התינוק השבוע', 'המשימות שלך לשבוע, עם סימון של מה שכבר עשית', 'הבדיקות, בשפה פשוטה', 'תיק לידה, תזמון צירים ומעקב בטן'],
+    cta: 'ממשיכים באפליקציה',
+    ctaOnboarded: 'לאפליקציה',
+};
+
 export const TRIMESTER_NAMES = { 1: 'טרימסטר ראשון', 2: 'טרימסטר שני', 3: 'טרימסטר שלישי' };
 
 /** First sentences of a text, cut to a length that fits a search-result snippet. */
@@ -71,7 +79,7 @@ export const snippet = (text, max = 155) => {
 };
 
 export const weekMeta = (week) => ({
-    title: `שבוע ${week.week} להיריון: מה קורה איתה, איתו ומה אתה עושה | ${SITE_NAME}`,
+    title: `שבוע ${week.week} להיריון: מה קורה איתה, וכמה גדול התינוק | ${SITE_NAME}`,
     description: snippet(week.partnerStatus.text),
 });
 
@@ -81,9 +89,8 @@ export const articleMeta = (article) => ({
 });
 
 export const PAGE_META = {
-    weeks: { title: `כל שבועות ההיריון, שבוע אחרי שבוע | ${SITE_NAME}`, description: 'מדריך לאבא לכל שבוע בהיריון: מה קורה עם בת הזוג, מה קורה עם התינוק, למה הוא דומה בגודל, ומה המשימות שלך השבוע.' },
+    weeks: { title: `כל שבועות ההיריון, שבוע אחרי שבוע | ${SITE_NAME}`, description: 'מדריך לאבא לכל שבוע בהיריון: מה קורה עם בת הזוג, ולמה התינוק דומה בגודל.' },
     articles: { title: `מאמרים לאבא שבדרך | ${SITE_NAME}`, description: 'מאמרי דעה והמלצות לגברים בדרך להיות אבא, לפי חודשי ההיריון: זוגיות, כסף, עבודה, פחדים, ציוד וחדר הלידה.' },
-    exams: { title: `הבדיקות בהיריון, לפי חודשים | ${SITE_NAME}`, description: 'מה זו כל בדיקה, מתי היא בערך, ומה התפקיד שלך ביום עצמו. מידע כללי לאבא, שלא מחליף את המרפאה של בת הזוג.' },
     about: { title: `מי אני ולמה בניתי את אבאל'ה | ${SITE_NAME}`, description: "הסיפור מאחורי אבאל'ה: מדריך בעברית לגברים בדרך להיות אבא, שנבנה על ידי אבא." },
     privacy: { title: `מדיניות פרטיות | ${SITE_NAME}`, description: "אילו נתונים אבאל'ה אוספת, איך הם נשמרים, עוגיות ופרסומות, ואיך מוחקים נתונים." },
     contact: { title: `יצירת קשר | ${SITE_NAME}`, description: "שאלה, רעיון או בקשה? כך יוצרים קשר עם אבאל'ה." },

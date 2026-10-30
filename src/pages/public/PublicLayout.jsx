@@ -7,7 +7,6 @@ import { isOnboarded } from './publicHooks';
 const NAV = [
     { to: '/weeks', label: 'שבועות' },
     { to: '/articles', label: 'מאמרים' },
-    { to: '/exams', label: 'בדיקות' },
 ];
 
 const FOOTER_LINKS = [

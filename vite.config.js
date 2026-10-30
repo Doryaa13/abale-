@@ -23,7 +23,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globIgnores: ['weeks/**', 'articles/**', 'article/**', 'exams/**', 'about/**', 'contact/**', 'privacy/**', 'sitemap.xml'],
+        globIgnores: ['weeks/**', 'articles/**', 'article/**', 'about/**', 'contact/**', 'privacy/**', 'sitemap.xml'],
       },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {

@@ -3,8 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { ChevronRight, ChevronLeft } from 'lucide-react';
 import PublicLayout from './PublicLayout';
 import ArticleCard from './ArticleCard';
-import { usePageMeta, usePublicContent } from './publicHooks';
-import { TRIMESTER_NAMES, weekMeta } from '../../data/sitePages';
+import { isOnboarded, usePageMeta, usePublicContent } from './publicHooks';
+import { TRIMESTER_NAMES, WEEK_GATE, weekMeta } from '../../data/sitePages';
 
 const WeekPage = () => {
     const { week: weekParam } = useParams();
@@ -48,27 +48,14 @@ const WeekPage = () => {
                 )}
             </section>
 
-            <section className="abl-pub-section">
-                <h2>מה קורה עם התינוק?</h2>
-                <p className="abl-pub-text">{week.babyStatus.text}</p>
-            </section>
-
-            <section className="abl-pub-section">
-                <h2>המשימות שלך השבוע</h2>
-                {week.tasks.map((cat) => (
-                    <div key={cat.category} className="abl-pub-tasks">
-                        <h3>{cat.category}</h3>
-                        <ul>
-                            {cat.items.map((item) => (
-                                <li key={item.text}>
-                                    <strong>{item.text}</strong>
-                                    {item.description && <span>{item.description}</span>}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
-                <Link to="/start" className="abl-pub-btn" data-primary>לסמן משימות באפליקציה</Link>
+            <section className="abl-pub-gate">
+                <h2>{WEEK_GATE.title}</h2>
+                <ul>
+                    {WEEK_GATE.items.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+                {isOnboarded()
+                    ? <Link to="/" className="abl-pub-btn abl-pub-btn-big" data-primary>{WEEK_GATE.ctaOnboarded}</Link>
+                    : <Link to="/start" className="abl-pub-btn abl-pub-btn-big" data-primary>{WEEK_GATE.cta}</Link>}
             </section>
 
             {month?.articles?.length > 0 && (

@@ -74,7 +74,7 @@
       var p = location.pathname, returning = false, standalone = false;
       try { returning = !!localStorage.getItem('abale_onboarding_done'); } catch (e) { }
       try { standalone = matchMedia('(display-mode: standalone)').matches; } catch (e) { }
-      var isPublic = /^\/(weeks|articles|article|exams|about|contact|privacy)(\/|$)/.test(p) || (p === '/' && !returning && !standalone);
+      var isPublic = /^\/(weeks|articles|article|about|contact|privacy)(\/|$)/.test(p) || (p === '/' && !returning && !standalone);
       var el = document.querySelector('[data-prerender]');
       if (el && !isPublic) el.remove();
     })();
