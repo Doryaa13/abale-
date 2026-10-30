@@ -2,13 +2,20 @@ import React, { useEffect } from 'react';
 import { SHOW_AD_PLACEHOLDERS } from '../config/features';
 
 const AdSense = ({ style = {}, client = 'ca-pub-2656222814993117', slot }) => {
+    // Without a real ad unit there's nothing to show: no empty boxes (Google's
+    // Auto ads, from the script in index.html, place their own ads).
+    const active = !!slot || SHOW_AD_PLACEHOLDERS;
+
     useEffect(() => {
+        if (!active) return;
         try {
             (window.adsbygoogle = window.adsbygoogle || []).push({});
         } catch (e) {
             console.error('AdSense error:', e);
         }
-    }, []);
+    }, [active]);
+
+    if (!active) return null;
 
     return (
         <div style={{ overflow: 'hidden', textAlign: 'center', ...style }}>

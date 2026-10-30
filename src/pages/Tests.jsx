@@ -7,6 +7,7 @@ import { WEEKS_DATA as localWeeksData } from '../services/contentService';
 import { getPregnancyMonth } from '../utils/pregnancyUtils';
 import DateModal from '../components/DateModal';
 import AdSense from '../components/AdSense';
+import { SHOW_AD_PLACEHOLDERS } from '../config/features';
 import AuroraBackground from '../components/AuroraBackground';
 import { accentVars, rgba } from '../utils/accent';
 
@@ -260,7 +261,7 @@ const Tests = ({ currentWeek }) => {
 
                                 // Show an ad slot between exams (after the 2nd), only when
                                 // there are enough exams for it to actually fall in the middle.
-                                const showAdAfter = idx === 1 && exams.length > 2;
+                                const showAdAfter = SHOW_AD_PLACEHOLDERS && idx === 1 && exams.length > 2;
 
                                 return (
                                     <React.Fragment key={exam.id || idx}>

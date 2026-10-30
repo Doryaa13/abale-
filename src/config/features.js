@@ -13,4 +13,4 @@ export const GATE_REGISTRATION = false;
 
 // Show a labeled "ad slot" placeholder where AdSense ads will render, so the ad
 // locations are visible before approval. Set to false once real ads are serving.
-export const SHOW_AD_PLACEHOLDERS = true;
+export const SHOW_AD_PLACEHOLDERS = false;

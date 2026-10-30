@@ -1,6 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /admin
 
 # Google AdSense crawler
 User-agent: Mediapartners-Google
 Allow: /
+
+Sitemap: https://www.abale.app/sitemap.xml

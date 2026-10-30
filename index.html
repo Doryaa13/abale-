@@ -3,12 +3,22 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="icon" type="image/png" href="/pwa-192x192.png" />
+  <link rel="apple-touch-icon" href="/pwa-192x192.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0b1120" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="background-color" content="#0b1120" />
-  <title>אבאל'ה - המדריך לאבא שבדרך</title>
+  <title>אבאל'ה: המדריך לאבא שבדרך, שבוע אחרי שבוע</title>
+  <meta name="description" content="מה קורה איתה, מה קורה איתו, ומה בדיוק אתה יכול לעשות השבוע. מדריך חינמי בעברית לגברים בדרך להיות אבא: משימות שבועיות, הבדיקות בשפה פשוטה ומאמרים." />
+  <link rel="canonical" href="https://www.abale.app" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="he_IL" />
+  <meta property="og:site_name" content="אבאל'ה" />
+  <meta property="og:title" content="אבאל'ה: המדריך לאבא שבדרך, שבוע אחרי שבוע" />
+  <meta property="og:description" content="מה קורה איתה, מה קורה איתו, ומה בדיוק אתה יכול לעשות השבוע. מדריך חינמי בעברית לגברים בדרך להיות אבא: משימות שבועיות, הבדיקות בשפה פשוטה ומאמרים." />
+  <meta property="og:url" content="https://www.abale.app" />
+  <meta property="og:image" content="https://www.abale.app/pwa-512x512.png" />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2656222814993117"
     crossorigin="anonymous"></script>
   <!-- Fonts -->
@@ -57,6 +67,18 @@
 
 <body>
   <div id="root"></div>
+  <script>
+    // The static page text is for visitors of the public pages (and crawlers).
+    // App screens, and returning users on the home screen, skip straight to the app.
+    (function () {
+      var p = location.pathname, returning = false, standalone = false;
+      try { returning = !!localStorage.getItem('abale_onboarding_done'); } catch (e) { }
+      try { standalone = matchMedia('(display-mode: standalone)').matches; } catch (e) { }
+      var isPublic = /^\/(weeks|articles|article|exams|about|contact|privacy)(\/|$)/.test(p) || (p === '/' && !returning && !standalone);
+      var el = document.querySelector('[data-prerender]');
+      if (el && !isPublic) el.remove();
+    })();
+  </script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

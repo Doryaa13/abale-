@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, Bookmark, BookmarkCheck } from 'lucide-react';
 import { fetchGuidesData, MEDICAL_NOTE } from '../services/contentService';
 import { GUIDES_DATA as localGuidesData } from '../services/contentService';
 import { useAuth } from '../context/AuthContext';
 import RegistrationGate from '../components/RegistrationGate';
+import { PublicFooter } from './public/PublicLayout';
+import { isOnboarded, usePageMeta } from './public/publicHooks';
+import { articleMeta } from '../data/sitePages';
 
 const getReadingTime = (content) => {
     if (!content || typeof content !== 'string') return '3 דק\'';
@@ -16,9 +19,13 @@ const getReadingTime = (content) => {
 const ArticlePage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [article, setArticle] = useState(null);
     const [isSaved, setIsSaved] = useState(false);
     const [notFound, setNotFound] = useState(false);
+    usePageMeta(article
+        ? { ...articleMeta(article), path: `/article/${article.id}` }
+        : { path: `/article/${id}` });
 
     // "First article free": the first article a logged-out user opens is theirs
     // to keep; any other article is gated until they register.
@@ -116,6 +123,8 @@ const ArticlePage = () => {
     );
 
     const defaultGradient = article.gradient || 'linear-gradient(135deg, #11151c 0%, #161e29 100%)';
+    const related = (localGuidesData.find((m) => m.articles.some((a) => a.id === article.id))?.articles || [])
+        .filter((a) => a.id !== article.id);
 
     return (
         <div className="min-h-screen bg-bg-core flex flex-col">
@@ -123,7 +132,7 @@ const ArticlePage = () => {
             {/* Navbar Overlay */}
             <div className="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-50 pointer-events-none">
                 <button
-                    onClick={() => navigate(-1)} // Assuming user came from /tests or /saved
+                    onClick={() => (location.key === 'default' ? navigate(isOnboarded() ? '/tests' : '/articles') : navigate(-1))} // came from inside the app, or opened directly
                     className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition-colors pointer-events-auto shadow-lg"
                 >
                     <ArrowRight size={24} />
@@ -184,8 +193,15 @@ const ArticlePage = () => {
                     <p className="text-gray-300 leading-relaxed text-base">{article.content}</p>
                 )}
                 <p className="abl-medical-note">{MEDICAL_NOTE}</p>
+                {related.length > 0 && (
+                    <nav className="abl-pub-related" aria-label="עוד מאמרים">
+                        <h2>עוד מאמרים לאותו חודש</h2>
+                        {related.map((a) => <Link key={a.id} to={`/article/${a.id}`}>{a.title}</Link>)}
+                    </nav>
+                )}
             </div>
             </RegistrationGate>
+            {!isOnboarded() && <PublicFooter />}
         </div>
     );
 };

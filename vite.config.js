@@ -1,6 +1,20 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { prerender } from './scripts/prerender.js'
+
+// After the bundle is written: static HTML for the public pages + sitemap.xml.
+const prerenderPublicPages = () => ({
+  name: 'abale-prerender',
+  apply: 'build',
+  closeBundle: {
+    order: 'post',
+    handler() {
+      const count = prerender('dist')
+      console.log(`prerendered ${count} public pages`)
+    },
+  },
+})
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -8,6 +22,9 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        globIgnores: ['weeks/**', 'articles/**', 'article/**', 'exams/**', 'about/**', 'contact/**', 'privacy/**', 'sitemap.xml'],
+      },
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
         name: "אבאל'ה",
@@ -30,6 +47,7 @@ export default defineConfig({
           }
         ]
       }
-    })
+    }),
+    prerenderPublicPages(),
   ],
 })

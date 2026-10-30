@@ -116,9 +116,7 @@ export const WEEKS_DATA = startContent.weeks;
 /** Months 1–9: { month, title, exams: [{ id, name, info }], articles: [{ id, title, author, content, image, ... }] } */
 export const GUIDES_DATA = withArticleImages(startContent.guides);
 
-// Shown under the exams and at the end of articles: the content is general
-// guidance for the dad, not medical advice.
-export const MEDICAL_NOTE = 'המידע כאן כללי, ונועד לעזור לך להיות שם בשבילה. הוא לא מחליף רופא, אחות או מיילדת. משהו מרגיש לא תקין? מתקשרים לרופא או נוסעים למיון, לא מחכים.';
+export { MEDICAL_NOTE } from '../data/sitePages';
 
 // ── Published content (Firestore) ─────────────────────────────────────────────
 const weeksDoc = () => doc(db, 'content', 'weeks');

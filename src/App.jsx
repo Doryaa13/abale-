@@ -25,6 +25,19 @@ import AuthModal from './components/AuthModal';
 
 // The content editor is only for the admin — load it on demand.
 const Admin = lazy(() => import('./pages/Admin'));
+
+// Public pages (readable without signing up, and what search engines see).
+const Landing = lazy(() => import('./pages/public/Landing'));
+const WeeksIndex = lazy(() => import('./pages/public/WeeksIndex'));
+const WeekPage = lazy(() => import('./pages/public/WeekPage'));
+const ArticlesIndex = lazy(() => import('./pages/public/ArticlesIndex'));
+const ExamsPage = lazy(() => import('./pages/public/ExamsPage'));
+const AboutPage = lazy(() => import('./pages/public/AboutPage'));
+const ContactPage = lazy(() => import('./pages/public/ContactPage'));
+
+const isStandaloneApp = () => {
+  try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch { return false; }
+};
 import { clearPhotos, migrateLegacyPhotos } from './services/photoStore';
 
 
@@ -651,6 +664,8 @@ const computeCurrentWeek = () => {
 
 // --- App Content ---
 const AppContent = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [welcomeWeek, setWelcomeWeek] = useState(null);
 
@@ -719,8 +734,13 @@ const AppContent = () => {
 
   const shouldRenderOnboarding = isOnboarding;
 
+  // New web visitors land on the public home page; its button leads to /start.
+  // The installed app goes straight to onboarding.
+  const showLanding = shouldRenderOnboarding && location.pathname === '/' && !isStandaloneApp();
+
   return (
     <>
+      <Suspense fallback={<div style={{ minHeight: '100dvh', background: 'var(--bg-core)' }} />}>
       <Routes>
 
         {/* Full Screen Overlays */}
@@ -731,20 +751,27 @@ const AppContent = () => {
         <Route path="/article/:id" element={<ArticlePage />} />
         <Route path="/jokes" element={<DadJokes />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/admin" element={
-          <Suspense fallback={<div style={{ minHeight: '100dvh', background: 'var(--bg-core)' }} />}>
-            <Admin />
-          </Suspense>
-        } />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/weeks" element={<WeeksIndex />} />
+        <Route path="/weeks/:week" element={<WeekPage />} />
+        <Route path="/articles" element={<ArticlesIndex />} />
+        <Route path="/exams" element={<ExamsPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
 
         {/* Main App Slider or Onboarding (catch-all, must be LAST) */}
         <Route path="/*" element={
-          shouldRenderOnboarding
-            ? <Onboarding onComplete={(w) => { setCurrentWeek(w); setIsOnboarding(false); }} />
-            : <MainLayout currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} />
+          showLanding
+            ? <Landing />
+            : shouldRenderOnboarding
+              ? <Onboarding onComplete={(w) => { setCurrentWeek(w); setIsOnboarding(false); navigate('/', { replace: true }); }} />
+              : location.pathname === '/start'
+                ? <Navigate to="/" replace />
+                : <MainLayout currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} />
         } />
 
       </Routes>
+      </Suspense>
 
       <WeekWelcomeModal
         isOpen={showWelcomeModal}
