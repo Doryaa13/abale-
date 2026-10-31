@@ -142,7 +142,7 @@ const ADS = [
     ${logo()}
     <div class="copy">
       <h1 class="sm">יש אפליקציה שתלווה אותך ב${hl('הריון של בת הזוג שלך')}</h1>
-      <p class="sub">מדברת בשפה שלך. בלי חפירות, בלי פורומים.</p>
+      <p class="sub">אבאל׳ה מדבר בשפה שלך. בלי חפירות, בלי פורומים.</p>
     </div>
     ${feedPhone('home.png', 'transform:rotate(-4deg)')}
   `],
@@ -240,7 +240,7 @@ const ADS = [
       <div class="search"><span>🔍</span>מה זה אומר שבוע 24 בהריון<i></i></div>
     </div>
     <div style="position:absolute;top:1180px;left:60px;right:60px;text-align:center;z-index:5">
-      <h1 class="sm">או ש${hl('אבאל׳ה כבר אמרה לך.')}</h1>
+      <h1 class="sm">או ש${hl('אבאל׳ה כבר אמר לך.')}</h1>
     </div>
     ${phone('home.png', { w: 560, style: 'left:260px;top:1420px;transform:rotate(-4deg)' })}
     <style>
