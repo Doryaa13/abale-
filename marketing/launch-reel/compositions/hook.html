@@ -1,0 +1,59 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-hebrew-900-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-latin-900-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+
+    #root { position: absolute; inset: 0; font-family: "Heebo", sans-serif; color: #f8fafc; }
+    .hk-stage { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 168px 80px 590px; direction: rtl; text-align: center; }
+    .hk-line { font-weight: 900; font-size: 112px; line-height: 1.08; letter-spacing: -0.01em; white-space: nowrap; }
+    .hk-w { display: inline-block; }
+    .hk-accent { color: #00f3ff; text-shadow: 0 0 28px rgba(0, 243, 255, 0.55); }
+    #hk-bar { width: 420px; height: 14px; border-radius: 7px; margin-top: 26px; background: linear-gradient(90deg, #bc13fe, #00f3ff); box-shadow: 0 0 24px rgba(0, 243, 255, 0.6); transform-origin: 100% 50%; }
+    #hk-b1 { font-size: 72px; font-weight: 700; color: #94a3b8; margin-bottom: 18px; }
+    .hk-l2 { font-weight: 900; font-size: 112px; line-height: 1.1; white-space: nowrap; }
+    .hk-w2 { display: inline-block; color: #475569; }
+    .hk-q { position: absolute; font-weight: 900; font-size: 150px; line-height: 1; }
+    #hk-q1 { left: 96px; top: 330px; color: #bc13fe; text-shadow: 0 0 30px rgba(188, 19, 254, 0.7); }
+    #hk-q2 { left: 860px; top: 400px; color: #ff9900; text-shadow: 0 0 30px rgba(255, 153, 0, 0.6); }
+    #hk-q3 { left: 150px; top: 1080px; color: #00f3ff; text-shadow: 0 0 30px rgba(0, 243, 255, 0.6); }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1080" data-height="1920">
+    <div id="hk-a" class="clip hk-stage" data-start="0" data-duration="2.3">
+      <div class="hk-line"><span class="hk-w">גילית</span> <span class="hk-w">שאתה</span> <span class="hk-w">הולך</span></div>
+      <div class="hk-line"><span class="hk-w">להיות</span> <span class="hk-w hk-accent">אבא?</span></div>
+      <div id="hk-bar"></div>
+    </div>
+    <div id="hk-b" class="clip hk-stage" data-start="2.3" data-duration="2.3" data-layout-allow-overflow>
+      <div id="hk-b1">ועכשיו...</div>
+      <div class="hk-l2"><span class="hk-w2">מה</span> <span class="hk-w2">בדיוק</span></div>
+      <div class="hk-l2"><span class="hk-w2">אתה</span> <span class="hk-w2">אמור</span></div>
+      <div class="hk-l2"><span class="hk-w2" id="hk-do">לעשות?</span></div>
+      <div class="hk-q" id="hk-q1">?</div>
+      <div class="hk-q" id="hk-q2">?</div>
+      <div class="hk-q" id="hk-q3">?</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // Beat A: the line is already on screen at frame 0 (it is the thumbnail).
+    tl.fromTo("#hk-bar", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "expo.out" }, 0.25);
+    tl.fromTo("#hk-a .hk-w", { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(10px)", duration: 0.18, stagger: 0.04, ease: "power2.in" }, 1.98);
+    tl.fromTo("#hk-bar", { opacity: 1 }, { opacity: 0, duration: 0.15 }, 2.05);
+
+    // Beat B: the doubt.
+    tl.fromTo("#hk-b1", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 2.32);
+    tl.fromTo("#hk-b .hk-w2", { color: "#334155" }, { color: "#f8fafc", duration: 0.12, stagger: 0.09, ease: "none" }, 2.7);
+    tl.fromTo("#hk-do", { color: "#f8fafc" }, { color: "#ccff00", duration: 0.15 }, 3.25);
+    ["#hk-q1", "#hk-q2", "#hk-q3"].forEach((q, i) => {
+      tl.fromTo(q, { opacity: 0, scale: 0.2, rotation: i % 2 ? 25 : -25 }, { opacity: 1, scale: 1, rotation: i % 2 ? 12 : -14, duration: 0.4, ease: "back.out(2.2)" }, 3.3 + i * 0.13);
+    });
+    // Whip up into the launch.
+    tl.fromTo("#hk-b", { y: 0, opacity: 1, filter: "blur(0px)" }, { y: -260, opacity: 0, filter: "blur(16px)", duration: 0.24, ease: "power3.in" }, 4.33);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

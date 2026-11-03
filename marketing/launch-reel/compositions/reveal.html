@@ -1,0 +1,55 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-hebrew-900-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-latin-900-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+
+    #root { position: absolute; inset: 0; font-family: "Heebo", sans-serif; color: #f8fafc; }
+    .rv-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding-bottom: 420px; }
+    .rv-num span { display: inline-block; font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 420px; line-height: 1; }
+    #rv-n3 span { color: #00f3ff; text-shadow: 0 0 60px rgba(0, 243, 255, 0.7); }
+    #rv-n2 span { color: #bc13fe; text-shadow: 0 0 60px rgba(188, 19, 254, 0.7); }
+    #rv-n1 span { color: #ccff00; text-shadow: 0 0 60px rgba(204, 255, 0, 0.6); }
+    #rv-main { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 168px 70px 590px; direction: rtl; text-align: center; }
+    #rv-burst { position: absolute; left: 140px; top: 260px; width: 800px; height: 800px; border-radius: 50%; background: radial-gradient(circle, rgba(0, 243, 255, 0.55) 0%, rgba(25, 127, 230, 0.25) 35%, rgba(11, 17, 32, 0) 70%); }
+    #rv-pill { font-weight: 700; font-size: 40px; color: #0b1120; background: #ccff00; padding: 10px 34px 14px; border-radius: 999px; box-shadow: 0 0 30px rgba(204, 255, 0, 0.45); margin-bottom: 46px; }
+    #rv-logo { width: 640px; height: auto; filter: drop-shadow(0 0 34px rgba(34, 211, 238, 0.45)); }
+    #rv-sub { margin-top: 56px; }
+    .rv-l { font-weight: 700; font-size: 66px; line-height: 1.22; white-space: nowrap; }
+    .rv-w { display: inline-block; }
+    .rv-hl { color: #00f3ff; }
+  </style>
+  <div id="root" data-composition-id="reveal" data-width="1080" data-height="1920">
+    <div id="rv-n3" class="clip rv-num" data-start="0" data-duration="0.3"><span>3</span></div>
+    <div id="rv-n2" class="clip rv-num" data-start="0.3" data-duration="0.3"><span>2</span></div>
+    <div id="rv-n1" class="clip rv-num" data-start="0.6" data-duration="0.3"><span>1</span></div>
+    <div id="rv-main" class="clip" data-start="0.9" data-duration="2.9" data-layout-allow-overflow>
+      <div id="rv-burst" data-layout-ignore></div>
+      <div id="rv-pill">חדש! עכשיו באוויר</div>
+      <img id="rv-logo" src="assets/logo.png" alt="אבאל'ה" />
+      <div id="rv-sub">
+        <div class="rv-l"><span class="rv-w">המדריך</span> <span class="rv-w">לאבא</span> <span class="rv-w">שבדרך,</span></div>
+        <div class="rv-l rv-hl"><span class="rv-w">שבוע</span> <span class="rv-w">אחרי</span> <span class="rv-w">שבוע</span></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // Countdown: three hard-cut punches.
+    ["#rv-n3 span", "#rv-n2 span", "#rv-n1 span"].forEach((n, i) => {
+      tl.fromTo(n, { scale: 1.7, opacity: 0, filter: "blur(14px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power4.out" }, i * 0.3);
+    });
+    // Ignition: the burst opens, then the mark lands through it.
+    tl.fromTo("#rv-burst", { scale: 0.15, opacity: 1 }, { scale: 1.6, opacity: 0, duration: 0.8, ease: "expo.out" }, 0.9);
+    tl.fromTo("#rv-logo", { scale: 1.45, opacity: 0, filter: "blur(18px) drop-shadow(0 0 34px rgba(34,211,238,0.45))" }, { scale: 1, opacity: 1, filter: "blur(0px) drop-shadow(0 0 34px rgba(34,211,238,0.45))", duration: 0.6, ease: "expo.out" }, 0.92);
+    tl.fromTo("#rv-pill", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.8)" }, 1.35);
+    tl.fromTo("#rv-sub .rv-w", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.14, stagger: 0.07, ease: "power2.out" }, 1.6);
+    // Blur swap out; the ground never cuts.
+    tl.fromTo("#rv-main", { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(10px)", duration: 0.2, ease: "power2.in" }, 3.55);
+    window.__timelines["reveal"] = tl;
+  </script>
+</template>

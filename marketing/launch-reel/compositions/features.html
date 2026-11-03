@@ -1,0 +1,112 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-hebrew-900-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-latin-900-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+
+    #root { position: absolute; inset: 0; font-family: "Heebo", sans-serif; color: #f8fafc; }
+    .ft-head { position: absolute; left: 0; right: 0; top: 176px; height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; direction: rtl; text-align: center; }
+    .ft-eb { font-weight: 700; font-size: 38px; color: #00f3ff; letter-spacing: 0.01em; margin-bottom: 6px; }
+    .ft-main { font-weight: 900; font-size: 72px; line-height: 1.1; white-space: nowrap; }
+    .ft-hl { color: #ccff00; }
+    #ft-stage { position: absolute; inset: 0; }
+    #ft-glow { position: absolute; left: 190px; top: 560px; width: 700px; height: 760px; border-radius: 50%; background: radial-gradient(ellipse, rgba(0, 243, 255, 0.32) 0%, rgba(25, 127, 230, 0.12) 45%, rgba(11, 17, 32, 0) 72%); filter: blur(30px); }
+    #ft-phone { position: absolute; left: 220px; top: 384px; width: 640px; height: 1000px; border-radius: 64px; padding: 12px; background: linear-gradient(160deg, #2a3a4c 0%, #111921 45%, #1a2632 100%); box-shadow: 0 0 0 2px rgba(0, 243, 255, 0.35), 0 0 60px rgba(0, 243, 255, 0.25), 0 40px 80px rgba(0, 0, 0, 0.6); }
+    #ft-view { position: relative; width: 616px; height: 976px; border-radius: 52px; overflow: hidden; background: #111921; }
+    .ft-scr { position: absolute; left: 0; top: 0; width: 616px; height: 1333px; }
+    .ft-zoom { width: 616px; height: 1333px; }
+    .ft-zoom img { display: block; width: 616px; height: 1333px; }
+  </style>
+  <div id="root" data-composition-id="features" data-width="1080" data-height="1920">
+    <div id="ft-stage" class="clip" data-start="0" data-duration="13.2" data-layout-allow-overflow>
+      <div id="ft-glow" data-layout-ignore></div>
+      <div id="ft-phone">
+        <div id="ft-view">
+          <div class="ft-scr" id="ft-s0"><div class="ft-zoom" id="ft-z0"><img src="assets/screens/home.jpg" alt="מסך הבית: שבוע 20" /></div></div>
+          <div class="ft-scr" id="ft-s1"><div class="ft-zoom" id="ft-z1"><img src="assets/screens/week.jpg" alt="שבוע 20 להיריון" /></div></div>
+          <div class="ft-scr" id="ft-s2"><div class="ft-zoom" id="ft-z2"><img src="assets/screens/tasks.jpg" alt="משימות שבוע 20" /></div></div>
+          <div class="ft-scr" id="ft-s3"><div class="ft-zoom" id="ft-z3"><img src="assets/screens/tests.jpg" alt="בדיקות החודש" /></div></div>
+          <div class="ft-scr" id="ft-s4"><div class="ft-zoom" id="ft-z4"><img src="assets/screens/timer.jpg" alt="תזמון צירים" /></div></div>
+          <div class="ft-scr" id="ft-s5"><div class="ft-zoom" id="ft-z5"><img src="assets/screens/bag.jpg" alt="תיק לחדר לידה" /></div></div>
+          <div class="ft-scr" id="ft-s6"><div class="ft-zoom" id="ft-z6"><img src="assets/screens/jokes.jpg" alt="בדיחות אבא" /></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ft-h0" class="clip ft-head" data-start="0" data-duration="2.2">
+      <div class="ft-eb">מתחילים מהשבוע שלכם</div>
+      <div class="ft-main"><span class="ft-hl">שבוע</span> אחרי שבוע</div>
+    </div>
+    <div id="ft-h1" class="clip ft-head" data-start="2.2" data-duration="2.2">
+      <div class="ft-eb">בכל שבוע מחדש</div>
+      <div class="ft-main">מה קורה <span class="ft-hl">איתה</span>, ומה איתו</div>
+    </div>
+    <div id="ft-h2" class="clip ft-head" data-start="4.4" data-duration="2.2">
+      <div class="ft-eb">לוגיסטיקה ותמיכה</div>
+      <div class="ft-main">משימות שבועיות <span class="ft-hl">בשבילך</span></div>
+    </div>
+    <div id="ft-h3" class="clip ft-head" data-start="6.6" data-duration="2.2">
+      <div class="ft-eb">בלי מילים מפחידות</div>
+      <div class="ft-main">הבדיקות, בשפה <span class="ft-hl">פשוטה</span></div>
+    </div>
+    <div id="ft-h4" class="clip ft-head" data-start="8.8" data-duration="2.2">
+      <div class="ft-eb">לקראת היום הגדול</div>
+      <div class="ft-main">טיימר צירים ו<span class="ft-hl">תיק ללידה</span></div>
+    </div>
+    <div id="ft-h5" class="clip ft-head" data-start="11" data-duration="2.2">
+      <div class="ft-eb">ובשביל האווירה</div>
+      <div class="ft-main">בדיחות אבא. <span class="ft-hl">כי חייבים.</span></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const VIEW_H = 976;
+    // Screen switch times and each screen's punch-in focus (fractions of the screenshot).
+    const switches = [0, 2.2, 4.4, 6.6, 8.8, 9.9, 11.0];
+    const focus = [[0.5, 0.33], [0.5, 0.36], [0.5, 0.38], [0.5, 0.36], [0.5, 0.2], [0.5, 0.36], [0.5, 0.5]];
+    const zoomTo = [1.16, 1.1, 1.16, 1.12, 1.2, 1.14, 1.12];
+
+    // Phone arrives from below, blurred, on a long tail.
+    tl.fromTo("#ft-phone", { y: 320, opacity: 0, filter: "blur(14px)" }, { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" }, 0);
+    tl.fromTo("#ft-glow", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" }, 0.1);
+
+    // Park every screen but the first below the viewport.
+    tl.set(".ft-scr", { y: VIEW_H }, 0);
+    tl.set("#ft-s0", { y: 0 }, 0);
+
+    switches.forEach((t, i) => {
+      const z = "#ft-z" + i;
+      tl.set(z, { transformOrigin: `${focus[i][0] * 616}px ${focus[i][1] * 1333}px`, scale: 1 }, 0);
+      if (i > 0) {
+        // Vertical push: the old screen leaves up as the new one rises in.
+        const isWhip = i === 6;
+        tl.fromTo("#ft-s" + (i - 1), { y: 0, filter: "blur(0px)" }, { y: -VIEW_H, filter: "blur(8px)", duration: isWhip ? 0.3 : 0.5, ease: "power3.inOut" }, t - (isWhip ? 0.3 : 0.5));
+        tl.fromTo("#ft-s" + i, { y: VIEW_H, filter: "blur(8px)" }, { y: 0, filter: "blur(0px)", duration: isWhip ? 0.3 : 0.5, ease: "power3.inOut" }, t - (isWhip ? 0.3 : 0.5));
+      }
+      // Punch-in on the part of the screen this beat is about, then hold still.
+      const end = i < switches.length - 1 ? switches[i + 1] : 13.2;
+      if (end - t > 1.4) {
+        tl.fromTo(z, { scale: 1 }, { scale: zoomTo[i], duration: 0.7, ease: "power2.inOut" }, t + 0.45);
+      }
+    });
+
+    // Headlines: blur in, hold, blur out.
+    const heads = [[0, 2.2], [2.2, 4.4], [4.4, 6.6], [6.6, 8.8], [8.8, 11.0], [11.0, 13.2]];
+    heads.forEach(([s, e], i) => {
+      const h = "#ft-h" + i;
+      tl.fromTo(h + " .ft-eb", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power2.out" }, s + 0.08);
+      tl.fromTo(h + " .ft-main", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, s + 0.14);
+      const outAt = i === heads.length - 1 ? 12.85 : e - 0.2;
+      tl.fromTo(h, { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(8px)", duration: 0.16, ease: "power2.in" }, outAt);
+    });
+
+    // The phone exits accelerating, making room for the promise.
+    tl.fromTo("#ft-phone", { scale: 1 }, { scale: 0.86, opacity: 0, filter: "blur(12px)", duration: 0.3, ease: "power3.in", immediateRender: false }, 12.88);
+    tl.fromTo("#ft-glow", { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power2.in", immediateRender: false }, 12.88);
+    window.__timelines["features"] = tl;
+  </script>
+</template>

@@ -1,0 +1,33 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-hebrew-900-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-latin-900-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+
+    #root { position: absolute; inset: 0; font-family: "Heebo", sans-serif; color: #f8fafc; }
+    #pr-stage { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 168px 80px 590px; direction: rtl; text-align: center; }
+    .pr-w { font-weight: 900; font-size: 168px; line-height: 1.12; white-space: nowrap; }
+    #pr-1 { color: #ccff00; text-shadow: 0 0 40px rgba(204, 255, 0, 0.45); }
+    #pr-2 { color: #00f3ff; text-shadow: 0 0 40px rgba(0, 243, 255, 0.5); }
+    #pr-3 { color: #f8fafc; }
+  </style>
+  <div id="root" data-composition-id="promise" data-width="1080" data-height="1920">
+    <div id="pr-stage" class="clip" data-start="0" data-duration="2.8">
+      <div class="pr-w" id="pr-1">חינם.</div>
+      <div class="pr-w" id="pr-2">בעברית.</div>
+      <div class="pr-w" id="pr-3">בלי בלבול.</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    ["#pr-1", "#pr-2", "#pr-3"].forEach((w, i) => {
+      tl.fromTo(w, { opacity: 0, scale: 1.5, filter: "blur(14px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "back.out(1.6)" }, 0.12 + i * 0.42);
+    });
+    tl.fromTo("#pr-stage", { opacity: 1, filter: "blur(0px)", y: 0 }, { opacity: 0, filter: "blur(12px)", y: -60, duration: 0.2, ease: "power3.in" }, 2.58);
+    window.__timelines["promise"] = tl;
+  </script>
+</template>

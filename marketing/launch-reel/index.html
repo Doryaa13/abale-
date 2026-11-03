@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="he" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-hebrew-900-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-latin-900-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+
+      :root {
+        --ground: #0b1120;
+        --ink: #f8fafc;
+        --muted: #94a3b8;
+        --neon-blue: #00f3ff;
+        --neon-green: #ccff00;
+        --neon-purple: #bc13fe;
+        --primary: #197fe6;
+        --font-display: "Heebo", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root { width: 100%; height: 100%; font-family: var(--font-display); background: var(--ground); }
+      #bg { position: absolute; inset: 0; overflow: hidden; background: var(--ground); }
+      .blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.55; }
+      #blob-a { width: 900px; height: 900px; left: -300px; top: -200px; background: radial-gradient(circle, #197fe6 0%, rgba(25,127,230,0) 70%); }
+      #blob-b { width: 800px; height: 800px; left: 520px; top: 700px; background: radial-gradient(circle, #bc13fe 0%, rgba(188,19,254,0) 70%); opacity: 0.4; }
+      #blob-c { width: 700px; height: 700px; left: 80px; top: 1250px; background: radial-gradient(circle, #00f3ff 0%, rgba(0,243,255,0) 70%); opacity: 0.28; }
+      #hexgrid {
+        position: absolute; inset: -120px;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='208' viewBox='0 0 120 208'><g fill='none' stroke='%2300f3ff' stroke-width='2'><path d='M60 4 L112 34 L112 94 L60 124 L8 94 L8 34 Z'/><path d='M0 124 L0 184 M120 124 L120 184 M60 124 L60 124'/><path d='M0 184 L60 214 M120 184 L60 214'/></g></svg>");
+        background-size: 120px 208px;
+        opacity: 0.05;
+      }
+      #vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(11,17,32,0) 45%, rgba(5,8,16,0.85) 100%); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="28.4" data-width="1080" data-height="1920">
+      <div id="bg" data-layout-ignore>
+        <div id="blob-a" class="blob"></div>
+        <div id="blob-b" class="blob"></div>
+        <div id="blob-c" class="blob"></div>
+        <div id="hexgrid"></div>
+        <div id="vignette"></div>
+      </div>
+
+      <div id="hook" data-composition-id="hook" data-composition-src="compositions/hook.html"
+        data-start="0" data-duration="4.6" data-track-index="1" data-track-kind="graphics"
+        data-width="1080" data-height="1920" style="z-index:2"></div>
+      <div id="reveal" data-composition-id="reveal" data-composition-src="compositions/reveal.html"
+        data-start="4.6" data-duration="3.8" data-track-index="1" data-track-kind="graphics"
+        data-width="1080" data-height="1920" style="z-index:3"></div>
+      <div id="features" data-composition-id="features" data-composition-src="compositions/features.html"
+        data-start="8.4" data-duration="13.2" data-track-index="1" data-track-kind="graphics"
+        data-width="1080" data-height="1920" style="z-index:4"></div>
+      <div id="promise" data-composition-id="promise" data-composition-src="compositions/promise.html"
+        data-start="21.6" data-duration="2.8" data-track-index="1" data-track-kind="graphics"
+        data-width="1080" data-height="1920" style="z-index:5"></div>
+      <div id="endcard" data-composition-id="endcard" data-composition-src="compositions/endcard.html"
+        data-start="24.4" data-duration="4" data-track-index="1" data-track-kind="graphics"
+        data-width="1080" data-height="1920" style="z-index:6"></div>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      // The world behind drifts slowly and constantly: linear is the point here.
+      tl.fromTo("#blob-a", { x: 0, y: 0 }, { x: 260, y: 380, duration: 28.4, ease: "none" }, 0);
+      tl.fromTo("#blob-b", { x: 0, y: 0 }, { x: -380, y: -260, duration: 28.4, ease: "none" }, 0);
+      tl.fromTo("#blob-c", { x: 0, y: 0 }, { x: 300, y: -200, duration: 28.4, ease: "none" }, 0);
+      tl.fromTo("#hexgrid", { y: 0 }, { y: -104, duration: 28.4, ease: "none" }, 0);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
