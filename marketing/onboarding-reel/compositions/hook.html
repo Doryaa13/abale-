@@ -17,7 +17,7 @@
     #hk-logo { width: 380px; height: auto; margin-top: 40px; filter: drop-shadow(0 0 26px rgba(34, 211, 238, 0.45)); }
   </style>
   <div id="root" data-composition-id="hook" data-width="1080" data-height="1920">
-    <div id="hk-stage" class="clip" data-start="0" data-duration="3">
+    <div id="hk-stage" class="clip" data-start="0" data-duration="1.8">
       <div id="hk-eb">אבא בדרך?</div>
       <div class="hk-line"><span class="hk-w">ככה</span></div>
       <div class="hk-line hk-accent"><span class="hk-w">מתחילים</span></div>
@@ -27,8 +27,8 @@
   <script>
     const tl = gsap.timeline({ paused: true });
     // Frame 0 already carries the hook; the mark fills in under it.
-    tl.fromTo("#hk-logo", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power3.out" }, 0.35);
-    tl.fromTo("#hk-stage", { y: 0, opacity: 1, filter: "blur(0px)" }, { y: -260, opacity: 0, filter: "blur(16px)", duration: 0.24, ease: "power3.in" }, 2.74);
+    tl.fromTo("#hk-logo", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.4, ease: "power3.out" }, 0.15);
+    tl.fromTo("#hk-stage", { y: 0, opacity: 1, filter: "blur(0px)" }, { y: -260, opacity: 0, filter: "blur(16px)", duration: 0.2, ease: "power3.in" }, 1.58);
     window.__timelines["hook"] = tl;
   </script>
 </template>

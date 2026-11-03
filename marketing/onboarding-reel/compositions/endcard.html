@@ -21,7 +21,7 @@
     #ec-share { margin-top: 44px; font-weight: 400; font-size: 42px; color: #94a3b8; white-space: nowrap; }
   </style>
   <div id="root" data-composition-id="endcard" data-width="1080" data-height="1920">
-    <div id="ec-stage" class="clip" data-start="0" data-duration="4.5" data-layout-allow-overflow>
+    <div id="ec-stage" class="clip" data-start="0" data-duration="3.5" data-layout-allow-overflow>
       <div class="ec-l1"><span class="ec-w">שם,</span> <span class="ec-w">שבוע,</span> <span class="ec-w">וזהו.</span></div>
       <div class="ec-l2"><span class="ec-w">אתה</span> <span class="ec-w">בפנים.</span></div>
       <div id="ec-logo-wrap"><img id="ec-logo" src="assets/logo.png" alt="אבאל'ה" /></div>
@@ -31,12 +31,12 @@
   </div>
   <script>
     const tl = gsap.timeline({ paused: true });
-    tl.fromTo("#ec-stage .ec-l1 .ec-w", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.14, stagger: 0.12, ease: "power2.out" }, 0.08);
-    tl.fromTo("#ec-stage .ec-l2 .ec-w", { opacity: 0, scale: 1.35, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.3, stagger: 0.1, ease: "back.out(1.5)" }, 0.55);
-    tl.fromTo("#ec-logo", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power3.out" }, 1.0);
-    tl.fromTo("#ec-url", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 1.35);
-    tl.fromTo("#ec-sweep", { x: -180 }, { x: 760, duration: 0.6, ease: "power2.inOut" }, 1.85);
-    tl.fromTo("#ec-share", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 1.95);
+    tl.fromTo("#ec-stage .ec-l1 .ec-w", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.14, stagger: 0.08, ease: "power2.out" }, 0.05);
+    tl.fromTo("#ec-stage .ec-l2 .ec-w", { opacity: 0, scale: 1.35, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.3, stagger: 0.08, ease: "back.out(1.5)" }, 0.32);
+    tl.fromTo("#ec-logo", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power3.out" }, 0.55);
+    tl.fromTo("#ec-url", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 0.8);
+    tl.fromTo("#ec-sweep", { x: -180 }, { x: 760, duration: 0.6, ease: "power2.inOut" }, 1.2);
+    tl.fromTo("#ec-share", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 1.15);
     window.__timelines["endcard"] = tl;
   </script>
 </template>
