@@ -1,0 +1,42 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-hebrew-900-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-latin-900-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+
+    #root { position: absolute; inset: 0; font-family: "Heebo", sans-serif; color: #f8fafc; }
+    #ec-stage { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 168px 70px 590px; direction: rtl; text-align: center; }
+    .ec-l1 { font-weight: 700; font-size: 66px; line-height: 1.15; white-space: nowrap; }
+    .ec-l2 { font-weight: 900; font-size: 104px; line-height: 1.1; color: #ccff00; text-shadow: 0 0 36px rgba(204, 255, 0, 0.4); white-space: nowrap; }
+    .ec-w { display: inline-block; }
+    #ec-logo-wrap { margin-top: 70px; }
+    #ec-logo { display: block; width: 330px; height: auto; filter: drop-shadow(0 0 26px rgba(34, 211, 238, 0.45)); }
+    #ec-url { position: relative; margin-top: 64px; padding: 18px 64px 26px; border-radius: 999px; border: 3px solid #00f3ff; background: rgba(0, 243, 255, 0.08); box-shadow: 0 0 40px rgba(0, 243, 255, 0.35), inset 0 0 30px rgba(0, 243, 255, 0.12); overflow: hidden; }
+    #ec-url-t { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 96px; line-height: 1.1; color: #f8fafc; direction: ltr; letter-spacing: -0.01em; }
+    #ec-sweep { position: absolute; top: -20px; left: 0; width: 140px; height: 200px; background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.45) 50%, rgba(255, 255, 255, 0) 100%); }
+    #ec-share { margin-top: 44px; font-weight: 400; font-size: 42px; color: #94a3b8; white-space: nowrap; }
+  </style>
+  <div id="root" data-composition-id="endcard" data-width="1080" data-height="1920">
+    <div id="ec-stage" class="clip" data-start="0" data-duration="4.5" data-layout-allow-overflow>
+      <div class="ec-l1"><span class="ec-w">שם,</span> <span class="ec-w">שבוע,</span> <span class="ec-w">וזהו.</span></div>
+      <div class="ec-l2"><span class="ec-w">אתה</span> <span class="ec-w">בפנים.</span></div>
+      <div id="ec-logo-wrap"><img id="ec-logo" src="assets/logo.png" alt="אבאל'ה" /></div>
+      <div id="ec-url"><div id="ec-sweep" data-layout-ignore></div><div id="ec-url-t">abale.app</div></div>
+      <div id="ec-share">חינם, בעברית, שבוע אחרי שבוע</div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#ec-stage .ec-l1 .ec-w", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.14, stagger: 0.12, ease: "power2.out" }, 0.08);
+    tl.fromTo("#ec-stage .ec-l2 .ec-w", { opacity: 0, scale: 1.35, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.3, stagger: 0.1, ease: "back.out(1.5)" }, 0.55);
+    tl.fromTo("#ec-logo", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power3.out" }, 1.0);
+    tl.fromTo("#ec-url", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, 1.35);
+    tl.fromTo("#ec-sweep", { x: -180 }, { x: 760, duration: 0.6, ease: "power2.inOut" }, 1.85);
+    tl.fromTo("#ec-share", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 1.95);
+    window.__timelines["endcard"] = tl;
+  </script>
+</template>

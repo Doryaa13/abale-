@@ -1,0 +1,163 @@
+<template>
+  <style>
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-hebrew-400-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 400; src: url("assets/fonts/heebo-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-hebrew-700-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("assets/fonts/heebo-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-hebrew-900-normal.woff2") format("woff2"); unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F; }
+    @font-face { font-family: "Heebo"; font-weight: 900; src: url("assets/fonts/heebo-latin-900-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+    @font-face { font-family: "Space Grotesk"; font-weight: 700; src: url("assets/fonts/space-grotesk-latin-700-normal.woff2") format("woff2"); }
+
+    #root { position: absolute; inset: 0; font-family: "Heebo", sans-serif; color: #f8fafc; }
+    .fl-head { position: absolute; left: 0; right: 0; top: 168px; height: 196px; display: flex; flex-direction: column; align-items: center; justify-content: center; direction: rtl; text-align: center; }
+    .fl-eb { font-weight: 700; font-size: 38px; color: #00f3ff; margin-bottom: 8px; }
+    .fl-pill { font-weight: 900; font-size: 36px; color: #0b1120; background: #00f3ff; padding: 4px 28px 8px; border-radius: 999px; box-shadow: 0 0 26px rgba(0, 243, 255, 0.5); margin-bottom: 14px; }
+    .fl-main { font-weight: 900; font-size: 74px; line-height: 1.1; white-space: nowrap; }
+    .fl-hl { color: #ccff00; }
+    .fl-zoom img.fl-on { opacity: 1; }
+    #fl-stage { position: absolute; inset: 0; }
+    #fl-glow { position: absolute; left: 190px; top: 560px; width: 700px; height: 760px; border-radius: 50%; background: radial-gradient(ellipse, rgba(0, 243, 255, 0.32) 0%, rgba(25, 127, 230, 0.12) 45%, rgba(11, 17, 32, 0) 72%); filter: blur(30px); }
+    #fl-phone { position: absolute; left: 220px; top: 384px; width: 640px; height: 1000px; border-radius: 64px; padding: 12px; background: linear-gradient(160deg, #2a3a4c 0%, #111921 45%, #1a2632 100%); box-shadow: 0 0 0 2px rgba(0, 243, 255, 0.35), 0 0 60px rgba(0, 243, 255, 0.25), 0 40px 80px rgba(0, 0, 0, 0.6); }
+    #fl-view { position: relative; width: 616px; height: 976px; border-radius: 52px; overflow: hidden; background: #111921; }
+    .fl-scr { position: absolute; left: 0; top: 0; width: 616px; height: 976px; }
+    .fl-zoom { position: absolute; left: 0; top: 0; width: 616px; height: 1333px; }
+    .fl-zoom img { opacity: 0; position: absolute; left: 0; top: 0; display: block; width: 616px; height: 1333px; }
+  </style>
+  <div id="root" data-composition-id="flow" data-width="1080" data-height="1920">
+    <div id="fl-stage" class="clip" data-start="0" data-duration="22" data-layout-allow-overflow>
+      <div id="fl-glow" data-layout-ignore></div>
+      <div id="fl-phone">
+        <div id="fl-view">
+          <div class="fl-scr" id="fl-s0"><div class="fl-zoom" id="fl-z0">
+            <img class="fl-on" id="fl-n0" src="assets/screens/name-0.jpg" alt="איך קוראים לך?" />
+            <img id="fl-n1" src="assets/screens/name-1.jpg" alt="" />
+            <img id="fl-n2" src="assets/screens/name-2.jpg" alt="" />
+            <img id="fl-n3" src="assets/screens/name-3.jpg" alt="היי, דור!" />
+          </div></div>
+          <div class="fl-scr" id="fl-s1"><div class="fl-zoom" id="fl-z1">
+            <img class="fl-on" id="fl-w3" src="assets/screens/week-3.jpg" alt="באיזה שבוע אנחנו?" />
+            <img id="fl-w4" src="assets/screens/week-4.jpg" alt="" />
+            <img id="fl-w5" src="assets/screens/week-5.jpg" alt="" />
+            <img id="fl-w6" src="assets/screens/week-6.jpg" alt="" />
+            <img id="fl-w7" src="assets/screens/week-7.jpg" alt="" />
+            <img id="fl-w8" src="assets/screens/week-8.jpg" alt="" />
+            <img id="fl-w9" src="assets/screens/week-9.jpg" alt="" />
+            <img id="fl-w10" src="assets/screens/week-10.jpg" alt="" />
+            <img id="fl-w11" src="assets/screens/week-11.jpg" alt="" />
+            <img id="fl-w12" src="assets/screens/week-12.jpg" alt="" />
+            <img id="fl-w13" src="assets/screens/week-13.jpg" alt="" />
+            <img id="fl-w14" src="assets/screens/week-14.jpg" alt="" />
+            <img id="fl-w15" src="assets/screens/week-15.jpg" alt="" />
+            <img id="fl-w16" src="assets/screens/week-16.jpg" alt="" />
+            <img id="fl-w17" src="assets/screens/week-17.jpg" alt="" />
+            <img id="fl-w18" src="assets/screens/week-18.jpg" alt="" />
+            <img id="fl-w19" src="assets/screens/week-19.jpg" alt="" />
+            <img id="fl-w20" src="assets/screens/week-20.jpg" alt="שבוע 20" />
+          </div></div>
+          <div class="fl-scr" id="fl-s2"><div class="fl-zoom" id="fl-z2"><img class="fl-on" src="assets/screens/home.jpg" alt="מסך הבית בשבוע 20" /></div></div>
+          <div class="fl-scr" id="fl-s3"><div class="fl-zoom" id="fl-z3"><img class="fl-on" src="assets/screens/week.jpg" alt="שבוע 20 להיריון" /></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="fl-h0" class="clip fl-head" data-start="0" data-duration="6">
+      <div class="fl-pill">צעד 1</div>
+      <div class="fl-main">כותבים את <span class="fl-hl">השם</span></div>
+    </div>
+    <div id="fl-h1" class="clip fl-head" data-start="6" data-duration="3.4">
+      <div class="fl-pill">צעד 2</div>
+      <div class="fl-main">בוחרים <span class="fl-hl">שבוע</span></div>
+    </div>
+    <div id="fl-h2" class="clip fl-head" data-start="9.4" data-duration="3.5">
+      <div class="fl-eb">לא בטוח באיזה שבוע?</div>
+      <div class="fl-main">שואלים אותה. <span class="fl-hl">בעדינות.</span></div>
+    </div>
+    <div id="fl-h3" class="clip fl-head" data-start="12.9" data-duration="3.1">
+      <div class="fl-eb">וזהו. מעכשיו, כל שבוע</div>
+      <div class="fl-main">המידע הכי <span class="fl-hl">רלוונטי</span></div>
+    </div>
+    <div id="fl-h4" class="clip fl-head" data-start="16" data-duration="3">
+      <div class="fl-eb">בשפה שלך</div>
+      <div class="fl-main">שבוע 20? <span class="fl-hl">מברג סטנדרטי.</span></div>
+    </div>
+    <div id="fl-h5" class="clip fl-head" data-start="19" data-duration="3">
+      <div class="fl-eb">ומתעדכן לבד</div>
+      <div class="fl-main">כל שבוע <span class="fl-hl">מחדש</span></div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const VW = 616, VH = 976, IW = 616, IH = 1333;
+
+    // Camera on a screen: scale about the top-left corner and pan so the focus
+    // point lands at the viewport centre, clamped so no edge of the screen shows.
+    const framing = (fx, fy, s) => {
+      const x = Math.min(0, Math.max(VW - IW * s, VW / 2 - fx * IW * s));
+      const y = Math.min(0, Math.max(VH - IH * s, VH / 2 - fy * IH * s));
+      return { x, y, scale: s };
+    };
+    const BASE = { x: 0, y: 0, scale: 1 };
+    const move = (sel, from, to, t, d) => tl.fromTo(sel, from, { ...to, duration: d, ease: "power2.inOut" }, t);
+
+    tl.set(".fl-zoom", { transformOrigin: "0px 0px", ...BASE }, 0);
+    tl.set("#fl-s1, #fl-s2, #fl-s3", { x: 0, y: VH }, 0);
+    tl.set("#fl-s1", { x: -VW, y: 0 }, 0);
+
+    // Phone arrives.
+    tl.fromTo("#fl-phone", { y: 320, opacity: 0, filter: "blur(14px)" }, { y: 0, opacity: 1, filter: "blur(0px)", duration: 0.8, ease: "expo.out" }, 0);
+    tl.fromTo("#fl-glow", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" }, 0.1);
+
+    // Step 1: the name is typed letter by letter (real app frames).
+    [[1, 1.3], [2, 1.62], [3, 1.94]].forEach(([k, t]) => {
+      tl.set("#fl-n" + (k - 1), { opacity: 0 }, t);
+      tl.set("#fl-n" + k, { opacity: 1 }, t);
+    });
+    const nameShot = framing(0.5, 0.56, 1.35);
+    move("#fl-z0", BASE, nameShot, 2.3, 0.7);
+    move("#fl-z0", nameShot, BASE, 4.85, 0.5);
+
+    // Into step 2: horizontal push, the way the app moves forward in Hebrew.
+    tl.fromTo("#fl-s0", { x: 0, filter: "blur(0px)" }, { x: VW, filter: "blur(8px)", duration: 0.45, ease: "power3.inOut" }, 5.55);
+    tl.fromTo("#fl-s1", { x: -VW, filter: "blur(8px)" }, { x: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.inOut" }, 5.55);
+
+    // The slider runs from week 3 to week 20, decelerating as it arrives.
+    for (let w = 4; w <= 20; w++) {
+      const k = (w - 3) / 17;
+      const t = 6.9 + 1.8 * (1 - Math.sqrt(1 - k));
+      tl.set("#fl-w" + (w - 1), { opacity: 0 }, t);
+      tl.set("#fl-w" + w, { opacity: 1 }, t);
+    }
+    // Punch in on the app's own line: "ask her gently".
+    const askShot = framing(0.5, 0.2, 1.32);
+    move("#fl-z1", BASE, askShot, 9.5, 0.6);
+    move("#fl-z1", askShot, BASE, 12.15, 0.45);
+
+    // Into the app: vertical push.
+    tl.fromTo("#fl-s1", { y: 0, filter: "blur(0px)" }, { y: -VH, filter: "blur(8px)", duration: 0.45, ease: "power3.inOut", immediateRender: false }, 12.6);
+    tl.fromTo("#fl-s2", { y: VH, filter: "blur(8px)" }, { y: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.inOut" }, 12.6);
+
+    // The size card, in his language.
+    const cardShot = framing(0.55, 0.73, 1.3);
+    move("#fl-z2", BASE, cardShot, 16.0, 0.7);
+
+    tl.fromTo("#fl-s2", { y: 0, filter: "blur(0px)" }, { y: -VH, filter: "blur(8px)", duration: 0.45, ease: "power3.inOut", immediateRender: false }, 18.7);
+    tl.fromTo("#fl-s3", { y: VH, filter: "blur(8px)" }, { y: 0, filter: "blur(0px)", duration: 0.45, ease: "power3.inOut" }, 18.7);
+    move("#fl-z3", BASE, framing(0.5, 0.3, 1.12), 19.6, 0.7);
+
+    // Headlines: blur in, hold, blur out.
+    const heads = [[0, 6], [6, 9.4], [9.4, 12.9], [12.9, 16], [16, 19], [19, 22]];
+    heads.forEach(([s, e], i) => {
+      const h = "#fl-h" + i;
+      const first = h + " > div:first-child", main = h + " .fl-main";
+      tl.fromTo(first, { opacity: 0, scale: 0.7, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.22, ease: "back.out(1.8)" }, s + 0.08);
+      tl.fromTo(main, { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, s + 0.16);
+      const outAt = i === heads.length - 1 ? 21.62 : e - 0.2;
+      tl.fromTo(h, { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(8px)", duration: 0.16, ease: "power2.in" }, outAt);
+    });
+
+    // The phone leaves, accelerating.
+    tl.fromTo("#fl-phone", { scale: 1 }, { scale: 0.86, opacity: 0, filter: "blur(12px)", duration: 0.3, ease: "power3.in", immediateRender: false }, 21.66);
+    tl.fromTo("#fl-glow", { opacity: 1 }, { opacity: 0, duration: 0.3, ease: "power2.in", immediateRender: false }, 21.66);
+    window.__timelines["flow"] = tl;
+  </script>
+</template>
